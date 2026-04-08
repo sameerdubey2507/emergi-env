@@ -18,8 +18,12 @@ dependencies = [
     "httpx>=0.24.0",
     "python-multipart>=0.0.6",
     "jinja2>=3.1.0",
-    "python-dotenv>=1.0.0"
+    "python-dotenv>=1.0.0",
+    "openenv-core>=0.2.0"
 ]
+
+[project.scripts]
+emergi-env = "server.app:app"
 
 [project.optional-dependencies]
 dev = [

@@ -88,9 +88,9 @@ if [ ! -f "/app/openenv.yaml" ]; then
     exit 1
 fi
 ok "openenv.yaml present"
-log "Importing server.main:app..."
-python3 -c "from server.main import app; print(f'FastAPI app loaded: {app.title}')" || {
-    fail "server.main:app failed to import — check for syntax errors"
+log "Importing server.app:app..."
+python3 -c "from server.app import app; print(f'FastAPI app loaded: {app.title}')" || {
+    fail "server.app:app failed to import — check for syntax errors"
     exit 1
 }
 ok "FastAPI application imported successfully"
