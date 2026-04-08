@@ -164,4 +164,4 @@ The environment calculates rewards based on:
 > [!TIP]
 > Use the **"Functions"** tab in the dashboard header to access technical sub-pages for API testing and clinical validation.
 
-Developed for the **Hugging Face OpenEnv Hackathon**.
+Developed for the **Hugging Face OpenEnv Hackathon** by sameerdubey2507
