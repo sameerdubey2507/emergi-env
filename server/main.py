@@ -706,7 +706,7 @@ async def _grade_async(grader_input: GraderInput) -> GraderResult:
     response_description="Initial observation from the environment",
     status_code=status.HTTP_200_OK,
 )
-async def reset_episode(body: ResetRequest) -> JSONResponse:
+async def reset_episode(body: ResetRequest = ResetRequest()) -> JSONResponse:
     t0 = time.monotonic()
     rec = await _sessions.get_or_create(body.session_id)
     try:
@@ -966,7 +966,7 @@ async def get_task(
     summary="Grade the current episode for a session",
     status_code=status.HTTP_200_OK,
 )
-async def grade_episode(body: GradeRequest) -> JSONResponse:
+async def grade_episode(body: GradeRequest = GradeRequest()) -> JSONResponse:
     rec = await _sessions.require(body.session_id, context="grade")
     env = rec.env
     if not env.is_done and not body.force_complete:
@@ -1037,7 +1037,7 @@ async def grade_episode(body: GradeRequest) -> JSONResponse:
     summary="Run GraderPipeline across multiple tasks (batch evaluation)",
     status_code=status.HTTP_200_OK,
 )
-async def grade_batch(body: BatchGradeRequest) -> JSONResponse:
+async def grade_batch(body: BatchGradeRequest = BatchGradeRequest()) -> JSONResponse:
     t0 = time.monotonic()
     task_ids = body.task_ids
     seeds = body.seeds or {}
