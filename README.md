@@ -1,3 +1,14 @@
+---
+title: "EMERGI-ENV: Command Nucleus"
+emoji: "🚑"
+colorFrom: "red"
+colorTo: "black"
+sdk: docker
+app_port: 7860
+pinned: true
+license: apache-2.0
+---
+
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
