@@ -5,7 +5,7 @@ import StatusChip from '../shared/StatusChip';
 
 export type TabId = 'command' | 'grid' | 'dispatch' | 'trauma' | 'bio' | 'analytics' | 'theory';
 
-const DOCS_URL = `${window.location.protocol}//${window.location.hostname}:7860/docs`;
+const DOCS_URL = '/docs';
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'command', label: 'Command Center', icon: <Radio size={16} /> },

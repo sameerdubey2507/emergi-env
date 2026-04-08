@@ -174,7 +174,7 @@ COPY --from=frontend-builder --chown=${APP_USER}:${APP_USER} /frontend/dist /app
 # Application source
 COPY --chown=${APP_USER}:${APP_USER} server/      /app/server/
 
-COPY --chown=${APP_USER}:${APP_USER} docs/       /app/docs/
+COPY --chown=${APP_USER}:${APP_USER} docs /app/docs
 COPY --chown=${APP_USER}:${APP_USER} scripts/     /app/scripts/
 COPY --chown=${APP_USER}:${APP_USER} inference.py /app/inference.py
 COPY --chown=${APP_USER}:${APP_USER} openenv.yaml /app/openenv.yaml

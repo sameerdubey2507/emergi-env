@@ -555,7 +555,7 @@ async def swagger_ui():
 
 @app.get("/health-dashboard", response_class=HTMLResponse, include_in_schema=False)
 async def health_dashboard():
-    _h = FilePath(__file__).parent.parent / "docs" / "emergi_health.html"
+    _h = FilePath(os.path.abspath(__file__)).parent.parent / "docs" / "emergi_health.html"
     if _h.exists():
         return HTMLResponse(content=_h.read_text(encoding="utf-8"))
     from fastapi.responses import RedirectResponse
@@ -563,7 +563,7 @@ async def health_dashboard():
 
 @app.get("/openapi-viewer", response_class=HTMLResponse, include_in_schema=False)
 async def openapi_viewer():
-    _o = FilePath(__file__).parent.parent / "docs" / "emergi_openapi.html"
+    _o = FilePath(os.path.abspath(__file__)).parent.parent / "docs" / "emergi_openapi.html"
     if _o.exists():
         return HTMLResponse(content=_o.read_text(encoding="utf-8"))
     from fastapi.responses import RedirectResponse
@@ -571,7 +571,7 @@ async def openapi_viewer():
 
 @app.get("/emergi_openapi.html", response_class=HTMLResponse, include_in_schema=False)
 async def openapi_viewer_direct():
-    _o = FilePath(__file__).parent.parent / "docs" / "emergi_openapi.html"
+    _o = FilePath(os.path.abspath(__file__)).parent.parent / "docs" / "emergi_openapi.html"
     if _o.exists():
         return HTMLResponse(content=_o.read_text(encoding="utf-8"))
     from fastapi.responses import RedirectResponse
@@ -579,7 +579,7 @@ async def openapi_viewer_direct():
 
 @app.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login_page():
-    _l = FilePath(__file__).parent.parent / "docs" / "emergi_login.html"
+    _l = FilePath(os.path.abspath(__file__)).parent.parent / "docs" / "emergi_login.html"
     if _l.exists():
         return HTMLResponse(content=_l.read_text(encoding="utf-8"))
     from fastapi.responses import RedirectResponse
@@ -587,7 +587,7 @@ async def login_page():
 
 @app.get("/automation", response_class=HTMLResponse, include_in_schema=False)
 async def automation_dashboard():
-    _a = FilePath(__file__).parent.parent / "docs" / "emergi_automation.html"
+    _a = FilePath(os.path.abspath(__file__)).parent.parent / "docs" / "emergi_automation.html"
     if _a.exists():
         return HTMLResponse(content=_a.read_text(encoding="utf-8"))
     from fastapi.responses import RedirectResponse
