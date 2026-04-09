@@ -245,11 +245,11 @@ class RetryPolicy:
 
     def __init__(
         self,
-        max_attempts: int = 4,
-        base_delay: float = 1.0,
+        max_attempts: int = 15,
+        base_delay: float = 2.0,
         max_delay: float = 30.0,
         jitter: float = 0.3,
-        retryable_status: Tuple[int, ...] = (429, 500, 502, 503, 504),
+        retryable_status: Tuple[int, ...] = (429, 500, 502, 503, 504, 0),
     ) -> None:
         self.max_attempts = max_attempts
         self.base_delay = base_delay
@@ -272,7 +272,7 @@ class RetryPolicy:
                 return True
             if isinstance(exc, APITimeoutError):
                 return True
-        if isinstance(exc, httpx.TimeoutException):
+        if isinstance(exc, (httpx.TimeoutException, httpx.ConnectError, httpx.ProtocolError)):
             return True
         if isinstance(exc, httpx.HTTPStatusError):
             return exc.response.status_code in self.retryable_status
@@ -1690,6 +1690,26 @@ def main() -> int:
         MODEL_NAME = args.model
 
     server = ServerClient(base_url=SERVER_URL)
+    
+    # Crucial: Wait for server to be healthy before starting benchmark
+    print(f"📡 Connecting to EMERGI-ENV server at {SERVER_URL} ...")
+    wait_start = time.monotonic()
+    healthy = False
+    while time.monotonic() - wait_start < 120:
+        try:
+            h = server.health()
+            if h.get("status") in ("ok", "healthy") or h.get("version"):
+                healthy = True
+                print(f"✅ Server is LIVE (responded in {time.monotonic()-wait_start:.1f}s)")
+                break
+        except Exception:
+            pass
+        print(f"⏳ Waiting for server... ({time.monotonic()-wait_start:.0f}s)", end="\r")
+        time.sleep(2.0)
+    
+    if not healthy:
+        print(f"\n❌ Server at {SERVER_URL} is UNREACHABLE after 120s. Aborting.", file=sys.stderr)
+        return 1
 
     if args.health_check:
         try:

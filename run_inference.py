@@ -53,7 +53,7 @@ def main() -> int:
     server_proc = subprocess.Popen(
         [
             sys.executable, "-m", "uvicorn",
-            "server.main:app",
+            "server.app:app",
             "--host", "0.0.0.0",
             "--port", str(SERVER_PORT),
             "--log-level", "warning",
