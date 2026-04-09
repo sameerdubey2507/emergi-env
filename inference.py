@@ -1213,16 +1213,14 @@ class EpisodeRunner:
         step_history: List[Dict[str, Any]] = []
         total_tokens = 0
         episode_id = "unknown"
+        print(f"[START] task={task_id} env=emergi_env model={self._agent.model}", flush=True)
 
         t0 = time.monotonic()
         try:
             reset_resp = self._server.reset(task_id, seed=effective_seed, session_id=self._session_id)
             obs_raw = reset_resp
             episode_id = reset_resp.get("info", {}).get("episode_id", reset_resp.get("episode_id", "unknown"))
-            print(f"[START] {task_id}", flush=True)
-            print(json.dumps({"event": "[START]", "task_id": task_id,
-            "episode_id": episode_id, "seed": effective_seed,
-            "session_id": self._session_id}), flush=True)
+
         except Exception as exc:
             logger.error("Reset failed for %s: %s", task_id, exc)
             return self._failed_result(task_id, effective_seed, episode_id, str(exc))
@@ -1268,17 +1266,17 @@ class EpisodeRunner:
                 done = bool(step_resp.get("done", False))
                 obs_raw = step_resp
                 episode_reward += reward
-                print(f"[STEP] {step}", flush=True)
-                print(json.dumps({"event": "[STEP]", "task_id": task_id,
-                "episode_id": episode_id, "step": step,
-                "action_type": action.get("action_type"), "reward": round(reward, 6),
-                "done": done}), flush=True)
 
             except Exception as exc:
                 logger.warning("Step %d failed: %s", step, exc)
                 reward = 0.0
                 error_msg = str(exc)
                 done = True
+
+            act_str = json.dumps(action, separators=(',', ':'))
+            err_val = "null" if error_msg is None else error_msg.replace('\n', ' ')
+            done_val = "true" if done else "false"
+            print(f"[STEP] step={step} action={act_str} reward={reward:.2f} done={done_val} error={err_val}", flush=True)
 
             sm = StepMetrics(
                 step=step,
@@ -1326,13 +1324,9 @@ class EpisodeRunner:
         p1_survival = float(grade_resp.get("p1_survival_rate", 0.0))
         prot_violations = int(grade_resp.get("protocol_violation_count", grade_resp.get("protocol_violations", 0)))
 
-        print(f"[END] {task_id} | score: {final_score:.4f}", flush=True)
-        print(json.dumps({"event": "[END]", "task_id": task_id,
-        "episode_id": episode_id, "final_score": round(final_score, 4),
-        "baseline": round(baseline, 4), "beats_baseline": beats,
-        "total_steps": step, "total_llm_tokens": total_tokens,
-        "p1_survival_rate": round(p1_survival, 4),
-        "protocol_violations": prot_violations}), flush=True)
+        success_val = "true" if beats else "false"
+        rewards_str = ",".join(f"{r['reward']:.2f}" for r in step_history)
+        print(f"[END] success={success_val} steps={step} score={final_score:.3f} rewards={rewards_str}", flush=True)
         grader_status = str(grade_resp.get("status", "unknown"))
 
         cascade_events = 0
@@ -1378,6 +1372,7 @@ class EpisodeRunner:
     def _failed_result(
         self, task_id: str, seed: int, episode_id: str, error: str
     ) -> EpisodeResult:
+        print(f"[END] success=false steps=0 score=0.000 rewards=", flush=True)
         return EpisodeResult(
             task_id=task_id,
             episode_id=episode_id,
@@ -1775,9 +1770,6 @@ def main() -> int:
             print(f"  ⚠️  Could not write results: {exc}", file=sys.stderr)
 
     server.close()
-
-    if any(r.final_score == 0.0 and r.error_message for r in results):
-        return 1
     return 0
 
 def _resolve_task_ids(args: argparse.Namespace) -> List[str]:
