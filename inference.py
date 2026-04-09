@@ -50,8 +50,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("emergi_env.inference")
 
-API_BASE_URL: str   = os.getenv("API_BASE_URL", "http://localhost:7860").rstrip("/")
-SERVER_URL: str     = os.getenv("SERVER_URL", "http://localhost:7860").rstrip("/")
+API_BASE_URL: str   = os.getenv("API_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+SERVER_URL: str     = os.getenv("SERVER_URL", "http://127.0.0.1:7860").rstrip("/")
 MODEL_NAME: str     = os.getenv("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")
 
 HF_TOKEN: str       = os.getenv("HF_TOKEN")
