@@ -7,6 +7,7 @@ import logging
 import os
 import random
 import re
+import subprocess
 import sys
 import time
 import traceback
@@ -1686,11 +1687,31 @@ def main() -> int:
 
     server = ServerClient(base_url=SERVER_URL)
     
-    # Crucial: Wait for server to be healthy before starting benchmark
     print(f"📡 Connecting to EMERGI-ENV server at {SERVER_URL} ...")
     wait_start = time.monotonic()
     healthy = False
-    while time.monotonic() - wait_start < 120:
+    server_proc = None
+
+    for attempt in range(2):
+        try:
+            h = server.health()
+            if h.get("status") in ("ok", "healthy") or h.get("version"):
+                healthy = True
+                print("✅ Server is already running.")
+                break
+        except Exception:
+            pass
+        if not healthy and attempt == 0:
+            print("⚡ Server not found. Spawning internal FastAPI server...", flush=True)
+            import subprocess
+            server_proc = subprocess.Popen(
+                [sys.executable, "-m", "uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            time.sleep(3)
+
+    while not healthy and time.monotonic() - wait_start < 120:
         try:
             h = server.health()
             if h.get("status") in ("ok", "healthy") or h.get("version"):
@@ -1704,6 +1725,8 @@ def main() -> int:
     
     if not healthy:
         print(f"\n❌ Server at {SERVER_URL} is UNREACHABLE after 120s. Aborting.", file=sys.stderr)
+        if server_proc:
+            server_proc.terminate()
         return 1
 
     if args.health_check:
@@ -1750,11 +1773,15 @@ def main() -> int:
     except KeyboardInterrupt:
         print("\n⚠️  Interrupted by user.")
         server.close()
+        if server_proc:
+            server_proc.terminate()
         return 130
     except Exception as exc:
         print(f"BenchmarkRunner crashed: {exc}", file=sys.stderr)
         traceback.print_exc()
         server.close()
+        if server_proc:
+            server_proc.terminate()
         return 1
 
     elapsed = time.monotonic() - t0
@@ -1770,6 +1797,15 @@ def main() -> int:
             print(f"  ⚠️  Could not write results: {exc}", file=sys.stderr)
 
     server.close()
+    
+    if server_proc:
+        print("\n  Shutting down internal server...", flush=True)
+        server_proc.terminate()
+        try:
+            server_proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            server_proc.kill()
+            
     return 0
 
 def _resolve_task_ids(args: argparse.Namespace) -> List[str]:
