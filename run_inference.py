@@ -12,12 +12,21 @@ Usage:
 """
 from __future__ import annotations
 
+import io
 import os
 import subprocess
 import sys
 import time
 import httpx
 from pathlib import Path
+
+# Fix Windows encoding issues by forcing UTF-8 if possible
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    except (AttributeError, io.UnsupportedOperation):
+        pass
 
 ROOT = Path(__file__).parent
 SERVER_PORT = int(os.getenv("PORT", "7860"))
@@ -46,9 +55,9 @@ def wait_for_server(url: str, timeout: float = MAX_WAIT_S) -> bool:
 def main() -> int:
                                                                                
     print()
-    print("═" * 80)
-    print("  EMERGI-ENV Launcher — starting FastAPI server on port", SERVER_PORT)
-    print("═" * 80)
+    print("=" * 80)
+    print("  EMERGI-ENV Launcher - starting FastAPI server on port", SERVER_PORT)
+    print("=" * 80)
 
     server_proc = subprocess.Popen(
         [
@@ -63,9 +72,9 @@ def main() -> int:
         stdin=subprocess.DEVNULL,
     )
 
-    print(f"\n  Waiting for server at {HEALTH_URL} …")
+    print(f"\n  Waiting for server at {HEALTH_URL} ...")
     if not wait_for_server(HEALTH_URL, timeout=MAX_WAIT_S):
-        print(f"\n  ❌  Server did not become healthy within {MAX_WAIT_S}s. Aborting.")
+        print(f"\n  [ERROR] Server did not become healthy within {MAX_WAIT_S}s. Aborting.")
         server_proc.terminate()
         return 1
 
@@ -81,11 +90,11 @@ def main() -> int:
         result = subprocess.run(inference_cmd, cwd=str(ROOT))
         exit_code = result.returncode
     except KeyboardInterrupt:
-        print("\n  ⚠️  Interrupted.")
+        print("\n  [INTERRUPTED]")
         exit_code = 130
     finally:
                                                                                
-        print("\n  Shutting down server …")
+        print("\n  Shutting down server ...")
         server_proc.terminate()
         try:
             server_proc.wait(timeout=10)

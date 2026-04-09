@@ -17,7 +17,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     try:
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
-    except AttributeError:
+    except (AttributeError, io.UnsupportedOperation):
         pass                                                    
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -1118,12 +1118,17 @@ class LLMAgent:
         self._extractor = ActionExtractor()
 
         if _OPENAI_AVAILABLE and api_key:
-            self._client = OpenAI(
-                api_key=api_key,
-                base_url=api_base,
-                timeout=timeout,
-            )
-            self._enabled = True
+            try:
+                self._client = OpenAI(
+                    api_key=api_key,
+                    base_url=api_base,
+                    timeout=timeout,
+                )
+                self._enabled = True
+            except Exception as exc:
+                logger.error("Failed to initialize LLM client: %s", exc)
+                self._client = None
+                self._enabled = False
         else:
             self._client = None
             self._enabled = False
@@ -1219,6 +1224,8 @@ class EpisodeRunner:
         t0 = time.monotonic()
         try:
             reset_resp = self._server.reset(task_id, seed=effective_seed, session_id=self._session_id)
+            if not isinstance(reset_resp, dict):
+                reset_resp = {}
             obs_raw = reset_resp
             episode_id = reset_resp.get("info", {}).get("episode_id", reset_resp.get("episode_id", "unknown"))
 
@@ -1235,8 +1242,12 @@ class EpisodeRunner:
 
         while not done and step < max_s:
             step += 1
-            obs = ObservationParser.parse(obs_raw)
-            user_prompt = PromptBuilder.build_user_prompt(obs, step_history)
+            try:
+                obs = ObservationParser.parse(obs_raw)
+                user_prompt = PromptBuilder.build_user_prompt(obs, step_history)
+            except Exception as exc:
+                logger.error("Parsing failed at step %d: %s", step, exc)
+                return self._failed_result(task_id, effective_seed, episode_id, f"Parsing error: {exc}")
 
             if self._mode == AgentMode.RULE_BASED:
                 t_act = time.monotonic()
@@ -1263,6 +1274,8 @@ class EpisodeRunner:
             error_msg = None
             try:
                 step_resp = self._server.step(action, session_id=self._session_id)
+                if not isinstance(step_resp, dict):
+                    step_resp = {}
                 reward = float(step_resp.get("reward", 0.0))
                 done = bool(step_resp.get("done", False))
                 obs_raw = step_resp
@@ -1308,6 +1321,8 @@ class EpisodeRunner:
 
         try:
             grade_resp = self._server.grade(session_id=self._session_id, force_complete=True)
+            if not isinstance(grade_resp, dict):
+                grade_resp = {}
         except Exception as exc:
             logger.error("Grading failed for %s: %s", task_id, exc)
             return self._failed_result(task_id, effective_seed, episode_id, f"grading: {exc}")
@@ -1407,23 +1422,23 @@ class ScoreDashboard:
     @staticmethod
     def header(mode: str, model: str) -> None:
         print()
-        print("═" * ScoreDashboard.WIDTH)
-        print("  EMERGI-ENV  ·  National AI Hackathon  ·  India 108/112 EMS Simulation")
+        print("=" * ScoreDashboard.WIDTH)
+        print("  EMERGI-ENV  |  National AI Hackathon  |  India 108/112 EMS Simulation")
         print(f"  Agent Mode: {mode.upper()}  |  Model: {model}  |  Server: {API_BASE_URL}")
         print(f"  Run started: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}")
-        print("═" * ScoreDashboard.WIDTH)
+        print("=" * ScoreDashboard.WIDTH)
 
     @staticmethod
     def task_start(task_id: str, difficulty: str, seed: int) -> None:
-        icon = {"easy": "🟢", "medium": "🟡", "hard": "🔴"}.get(difficulty, "⚪")
+        icon = {"easy": "(E)", "medium": "(M)", "hard": "(H)"}.get(difficulty, "(?)")
         print(f"\n{icon}  [{difficulty.upper():6}]  {task_id}  (seed={seed})")
-        print(f"  {'─' * (ScoreDashboard.WIDTH - 4)}")
+        print(f"  {'-' * (ScoreDashboard.WIDTH - 4)}")
 
     @staticmethod
     def task_done(result: EpisodeResult) -> None:
-        beat_icon = "✅" if result.beats_baseline else "❌"
+        beat_icon = "[PASS]" if result.beats_baseline else "[FAIL]"
         bar = ScoreDashboard._score_bar(result.final_score)
-        print(f"  {beat_icon}  Score: {result.final_score:.4f}  {bar}  baseline={result.baseline:.2f}  Δ={result.delta_vs_baseline:+.4f}")
+        print(f"  {beat_icon}  Score: {result.final_score:.4f}  {bar}  baseline={result.baseline:.2f}  delta={result.delta_vs_baseline:+.4f}")
         print(f"     Steps: {result.total_steps}  |  P1 survival: {result.p1_survival_rate:.0%}  |  "
               f"Protocol violations: {result.protocol_violations}  |  Tokens: {result.total_llm_tokens}")
         if result.error_message:
@@ -1435,14 +1450,14 @@ class ScoreDashboard:
     @staticmethod
     def summary(results: List[EpisodeResult], elapsed: float) -> None:
         print()
-        print("═" * ScoreDashboard.WIDTH)
+        print("=" * ScoreDashboard.WIDTH)
         print("  FINAL RESULTS")
-        print("═" * ScoreDashboard.WIDTH)
+        print("=" * ScoreDashboard.WIDTH)
         print(
             f"  {'Task':<28}  {'Diff':<6}  {'Score':>6}  {'Base':>5}  "
-            f"{'Δ':>7}  {'Beat?':<7}  {'Steps':>5}  {'Tokens':>7}  {'Status':<10}"
+            f"{'Delta':>7}  {'Beat?':<7}  {'Steps':>5}  {'Tokens':>7}  {'Status':<10}"
         )
-        print(f"  {'─' * 28}  {'─' * 6}  {'─' * 6}  {'─' * 5}  {'─' * 7}  {'─' * 7}  {'─' * 5}  {'─' * 7}  {'─' * 10}")
+        print(f"  {'-' * 28}  {'-' * 6}  {'-' * 6}  {'-' * 5}  {'-' * 7}  {'-' * 7}  {'-' * 5}  {'-' * 7}  {'-' * 10}")
 
         total_score = 0.0
         beats_count = 0
@@ -1451,8 +1466,8 @@ class ScoreDashboard:
 
         for r in results:
             diff = TASK_DIFFICULTIES.get(r.task_id, "?")
-            beat_str = "✓ YES" if r.beats_baseline else "✗ NO "
-            err_flag = " ⚠" if r.error_message else ""
+            beat_str = "YES" if r.beats_baseline else "NO "
+            err_flag = " (!)" if r.error_message else ""
             print(
                 f"  {r.task_id:<28}  {diff:<6}  {r.final_score:>6.4f}  {r.baseline:>5.2f}  "
                 f"{r.delta_vs_baseline:>+7.4f}  {beat_str:<7}  {r.total_steps:>5d}  "
@@ -1471,10 +1486,10 @@ class ScoreDashboard:
 
         n = len(results)
         avg = total_score / n if n else 0.0
-        print(f"  {'─' * 28}  {'─' * 6}  {'─' * 6}  {'─' * 5}  {'─' * 7}  {'─' * 7}  {'─' * 5}  {'─' * 7}  {'─' * 10}")
+        print(f"  {'-' * 28}  {'-' * 6}  {'-' * 6}  {'-' * 5}  {'-' * 7}  {'-' * 7}  {'-' * 5}  {'-' * 7}  {'-' * 10}")
         print(
-            f"  {'AGGREGATE':<28}  {'─' * 6}  {avg:>6.4f}  {'─' * 5}  {'─' * 7}  "
-            f"{beats_count}/{n} beat  {'─' * 5}  {total_tokens:>7d}"
+            f"  {'AGGREGATE':<28}  {'-' * 6}  {avg:>6.4f}  {'-' * 5}  {'-' * 7}  "
+            f"{beats_count}/{n} beat  {'-' * 5}  {total_tokens:>7d}"
         )
         print()
         if easy_scores:
@@ -1491,21 +1506,21 @@ class ScoreDashboard:
     @staticmethod
     def _score_bar(score: float, width: int = 30) -> str:
         filled = int(round(score * width))
-        bar = "█" * filled + "░" * (width - filled)
+        bar = "#" * filled + "-" * (width - filled)
         return f"|{bar}|"
 
     @staticmethod
     def validation_report(resp: Dict[str, Any]) -> None:
         print()
-        print("═" * ScoreDashboard.WIDTH)
+        print("=" * ScoreDashboard.WIDTH)
         print("  OPENENV CONTRACT VALIDATION REPORT")
-        print("═" * ScoreDashboard.WIDTH)
+        print("=" * ScoreDashboard.WIDTH)
         passed = resp.get("passed", False)
-        status_icon = "✅ ALL CHECKS PASSED" if passed else "❌ VALIDATION FAILED"
+        status_icon = "[PASS] ALL CHECKS PASSED" if passed else "[FAIL] VALIDATION FAILED"
         print(f"  {status_icon}")
         print()
         for check, ok in resp.get("checks", {}).items():
-            icon = "✓" if ok else "✗"
+            icon = "+" if ok else "-"
             print(f"  {icon}  {check}")
         failures = resp.get("failures", [])
         if failures:
@@ -1518,8 +1533,8 @@ class ScoreDashboard:
             print()
             print("  WARNINGS:")
             for w in warnings:
-                print(f"    ⚠ {w}")
-        print("═" * ScoreDashboard.WIDTH)
+                print(f"    (W) {w}")
+        print("=" * ScoreDashboard.WIDTH)
 
 class BenchmarkRunner:
 
@@ -1593,7 +1608,7 @@ def _results_to_json(results: List[EpisodeResult], elapsed: float) -> Dict[str, 
             "total_steps": r.total_steps,
             "total_reward": round(r.total_reward, 4),
             "grader_status": r.grader_status,
-            "grader_components": {k: round(v, 4) for k, v in r.grader_components.items()},
+            "grader_components": {k: round(v, 4) for k, v in r.grader_components.items()} if isinstance(r.grader_components, dict) else {},
             "grader_penalties": r.grader_penalties,
             "p1_survival_rate": round(r.p1_survival_rate, 4),
             "protocol_violations": r.protocol_violations,
@@ -1724,7 +1739,7 @@ def main() -> int:
         time.sleep(2.0)
     
     if not healthy:
-        print(f"\n❌ Server at {SERVER_URL} is UNREACHABLE after 120s. Aborting.", file=sys.stderr)
+        print(f"\n[ERROR] Server at {SERVER_URL} is UNREACHABLE after 120s. Aborting.", file=sys.stderr)
         if server_proc:
             server_proc.terminate()
         return 1

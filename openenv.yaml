@@ -51,7 +51,7 @@ server:
   host: "0.0.0.0"
   port: 7860
   framework: fastapi
-  entrypoint: "uvicorn server.main:app --host 0.0.0.0 --port 7860 --workers 1"
+  entrypoint: "uvicorn server.app:app --host 0.0.0.0 --port 7860 --workers 1"
   health_check_path: /health
   health_check_interval_seconds: 30
   startup_timeout_seconds: 60
