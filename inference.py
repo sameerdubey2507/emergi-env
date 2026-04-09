@@ -1219,7 +1219,7 @@ class EpisodeRunner:
             reset_resp = self._server.reset(task_id, seed=effective_seed, session_id=self._session_id)
             obs_raw = reset_resp
             episode_id = reset_resp.get("info", {}).get("episode_id", reset_resp.get("episode_id", "unknown"))
-            print(f"START: {task_id}", flush=True)
+            print(f"[START] {task_id}", flush=True)
             print(json.dumps({"event": "[START]", "task_id": task_id,
             "episode_id": episode_id, "seed": effective_seed,
             "session_id": self._session_id}), flush=True)
@@ -1268,7 +1268,7 @@ class EpisodeRunner:
                 done = bool(step_resp.get("done", False))
                 obs_raw = step_resp
                 episode_reward += reward
-                print(f"STEP: {step}", flush=True)
+                print(f"[STEP] {step}", flush=True)
                 print(json.dumps({"event": "[STEP]", "task_id": task_id,
                 "episode_id": episode_id, "step": step,
                 "action_type": action.get("action_type"), "reward": round(reward, 6),
@@ -1326,7 +1326,7 @@ class EpisodeRunner:
         p1_survival = float(grade_resp.get("p1_survival_rate", 0.0))
         prot_violations = int(grade_resp.get("protocol_violation_count", grade_resp.get("protocol_violations", 0)))
 
-        print(f"END: {task_id} | score: {final_score:.4f}", flush=True)
+        print(f"[END] {task_id} | score: {final_score:.4f}", flush=True)
         print(json.dumps({"event": "[END]", "task_id": task_id,
         "episode_id": episode_id, "final_score": round(final_score, 4),
         "baseline": round(baseline, 4), "beats_baseline": beats,
