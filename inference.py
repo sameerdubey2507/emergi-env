@@ -65,13 +65,7 @@ except Exception:
 API_BASE_URL: str   = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1").rstrip("/")
 MODEL_NAME:   str   = os.getenv("MODEL_NAME",   "meta-llama/Meta-Llama-3-8B-Instruct")
 HF_TOKEN:     str   = os.getenv("HF_TOKEN", os.getenv("API_KEY", ""))
-
-if not HF_TOKEN:
-    raise ValueError(
-        "CRITICAL: HF_TOKEN (or API_KEY) is missing. "
-        "The inference script requires a Hugging Face token to communicate with the model. "
-        "Please add it to your Hugging Face Space 'Secrets' (Settings -> Variables and Secrets)."
-    )
+# Validation moved to main() to prevent import-time crash
 
 API_KEY:      str   = HF_TOKEN        # alias — always equals HF_TOKEN
 
@@ -1023,6 +1017,14 @@ def main() -> int:
 
     base_url   = (args.server or SERVER_URL).rstrip("/")
     env_client = EnvClient(base_url)
+
+    # ── Mandatory Secret Check (Fail-Fast but Caught) ─────────────────────────
+    if not HF_TOKEN:
+        print("[ERROR] HF_TOKEN is missing. Please add it to your Space Secrets.", file=sys.stderr)
+        log_start("startup")
+        log_end(False, 0, 0.0, [])
+        return 1
+
 
     # ── Start server if not reachable ─────────────────────────────────────────
     server_proc = None
