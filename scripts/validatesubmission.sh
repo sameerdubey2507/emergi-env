@@ -712,9 +712,9 @@ else
     check_fail "health_200" "HTTP ${status} — server not healthy"
 fi
 
-log_step "POST /reset (task_1, seed=42) — PHASE 1 CRITICAL CHECK"
+log_step "POST /reset (task1_single_triage, seed=42) — PHASE 1 CRITICAL CHECK"
 ts=$(date +%s%3N)
-RESET_RESP=$(http_post_timed "${SERVER_URL}/reset" '{"task_id": "task_1", "seed": 42}')
+RESET_RESP=$(http_post_timed "${SERVER_URL}/reset" '{"task_id": "task1_single_triage", "seed": 42}')
 status=$(parse_status "${RESET_RESP}")
 body=$(parse_body "${RESET_RESP}")
 elapsed=$(parse_elapsed "${RESET_RESP}")
@@ -847,7 +847,7 @@ fi
 
 log_step "Dense reward validation (10 steps)"
 ts=$(date +%s%3N)
-http_post "${SERVER_URL}/reset" '{"task_id": "task_1", "seed": 99}' >/dev/null 2>&1
+http_post "${SERVER_URL}/reset" '{"task_id": "task1_single_triage", "seed": 99}' >/dev/null 2>&1
 NONZERO_REWARDS=0
 for i in $(seq 1 10); do
     resp=$(http_post "${SERVER_URL}/step" '{"action_type": "noop", "unit_id": null}')
@@ -870,13 +870,13 @@ check_pass "dense_rewards" "${NONZERO_REWARDS}/10 steps had non-zero reward — 
 
 log_head "STAGE 7 — All 9 Task Graders: Range, Schema & Components"
 
-declare -A TASK_DIFF=([task_1]=easy [task_2]=easy [task_3]=easy [task_4]=medium [task_5]=medium [task_6]=medium [task_7]=hard [task_8]=hard [task_9]=hard)
-declare -A TASK_BASELINE=([task_1]=0.61 [task_2]=0.72 [task_3]=0.68 [task_4]=0.44 [task_5]=0.38 [task_6]=0.42 [task_7]=0.29 [task_8]=0.24 [task_9]=0.17)
-declare -A TASK_NAME=([task_1]="Single Call Triage" [task_2]="Hospital Route" [task_3]="Unit Matching" [task_4]="Multi-Incident" [task_5]="Dynamic Rerouting" [task_6]="Pre-positioning" [task_7]="MCI START" [task_8]="ICU Transfer" [task_9]="City Surge")
+declare -A TASK_DIFF=([task1_single_triage]=easy [task2_hospital_route]=easy [task3_unit_type]=easy [task4_multi_incident]=medium [task5_dynamic_rerouting]=medium [task6_prepositioning]=medium [task7_mci_start]=hard [task8_transfer_cascade]=hard [task9_surge]=hard)
+declare -A TASK_BASELINE=([task1_single_triage]=0.61 [task2_hospital_route]=0.72 [task3_unit_type]=0.68 [task4_multi_incident]=0.44 [task5_dynamic_rerouting]=0.38 [task6_prepositioning]=0.42 [task7_mci_start]=0.29 [task8_transfer_cascade]=0.24 [task9_surge]=0.17)
+declare -A TASK_NAME=([task1_single_triage]="Single Call Triage" [task2_hospital_route]="Hospital Route" [task3_unit_type]="Unit Matching" [task4_multi_incident]="Multi-Incident" [task5_dynamic_rerouting]="Dynamic Rerouting" [task6_prepositioning]="Pre-positioning" [task7_mci_start]="MCI START" [task8_transfer_cascade]="ICU Transfer" [task9_surge]="City Surge")
 
 TASKS_GRADING_CORRECTLY=0
 
-for task_id in task_1 task_2 task_3 task_4 task_5 task_6 task_7 task_8 task_9; do
+for task_id in task1_single_triage task2_hospital_route task3_unit_type task4_multi_incident task5_dynamic_rerouting task6_prepositioning task7_mci_start task8_transfer_cascade task9_surge; do
     diff="${TASK_DIFF[$task_id]}"
     name="${TASK_NAME[$task_id]}"
     baseline="${TASK_BASELINE[$task_id]}"
@@ -990,7 +990,7 @@ fi
 log_head "STAGE 8 — Grader Determinism (3 Runs × 3 Tasks)"
 
 DETERMINISM_OVERALL=true
-for task_id in task_1 task_4 task_7; do
+for task_id in task1_single_triage task4_multi_incident task7_mci_start; do
     ts=$(date +%s%3N)
     declare -a RUN_SCORES=()
     for run in 1 2 3; do
@@ -1164,7 +1164,7 @@ PYEOF
         HF_TOKEN="dry-run-token" \
         DRY_RUN="true" \
         python3 "${PROJECT_ROOT}/inference.py" \
-        --task task_1 --seed 42 --max-steps 5 \
+        --task task1_single_triage --seed 42 --max-steps 5 \
         --server-url "${SERVER_URL}" \
         > "${INFERENCE_LOG}" 2>&1
     INF_EXIT=$?
@@ -1284,7 +1284,7 @@ if [[ "${SKIP_STRESS}" == "false" ]]; then
     THRPT_END=$(( THRPT_START + STRESS_DURATION ))
 
     while (( $(date +%s) < THRPT_END )); do
-        http_post "${SERVER_URL}/reset" '{"task_id": "task_1", "seed": 1}' >/dev/null 2>&1
+        http_post "${SERVER_URL}/reset" '{"task_id": "task1_single_triage", "seed": 1}' >/dev/null 2>&1
         for _ in 1 2 3; do
             http_post "${SERVER_URL}/step" '{"action_type": "noop", "unit_id": null}' >/dev/null 2>&1
         done
@@ -1303,7 +1303,7 @@ if [[ "${SKIP_HF}" == "false" ]] && [[ -n "${HF_SPACE_URL}" ]]; then
     ts=$(date +%s%3N)
     log_step "Pinging: ${HF_SPACE_URL}"
 
-    RESP=$(http_post_timed "${HF_SPACE_URL}/reset" '{"task_id": "task_1", "seed": 42}')
+    RESP=$(http_post_timed "${HF_SPACE_URL}/reset" '{"task_id": "task1_single_triage", "seed": 42}')
     STATUS=$(parse_status "${RESP}")
     ELAPSED=$(parse_elapsed "${RESP}")
     if [[ "${STATUS}" == "200" ]]; then
@@ -1393,7 +1393,7 @@ fi
 
 log_head "STAGE 16 — Response Latency Profiling (8 iterations each)"
 
-for endpoint_info in "GET:/health:null" "POST:/reset:{\"task_id\":\"task_1\",\"seed\":42}" "POST:/step:{\"action_type\":\"noop\",\"unit_id\":null}"; do
+for endpoint_info in "GET:/health:null" "POST:/reset:{\"task_id\":\"task1_single_triage\",\"seed\":42}" "POST:/step:{\"action_type\":\"noop\",\"unit_id\":null}"; do
     METHOD=$(echo "${endpoint_info}" | cut -d: -f1)
     ROUTE=$(echo "${endpoint_info}" | cut -d: -f2)
     DATA=$(echo "${endpoint_info}" | cut -d: -f3-)
