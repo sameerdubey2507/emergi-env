@@ -72,8 +72,6 @@ static/.cache/
 static/tsconfig.tsbuildinfo
 
 
-inference_results.json
-inference_results_*.json
 *.out
 
 
@@ -81,4 +79,4 @@ inference_results_*.json
 *.tmp
 *.temp
 *.orig
-restore_history.py
+

@@ -1,0 +1,806 @@
+{
+  "metadata": {
+    "run_timestamp": "2026-04-09T10:17:51.658020+00:00",
+    "api_base_url": "https://router.huggingface.co/v1",
+    "model_name": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "agent_mode": "hybrid",
+    "elapsed_seconds": 519.33,
+    "tasks_evaluated": 9
+  },
+  "summary": {
+    "aggregate_score": 0.4862,
+    "tasks_beat_baseline": 6,
+    "tasks_total": 9,
+    "total_llm_tokens": 120983,
+    "all_scores_in_range": true,
+    "easy_avg": 0.5932,
+    "medium_avg": 0.7088,
+    "hard_avg": 0.1567
+  },
+  "per_task": {
+    "task1_single_triage": {
+      "task_id": "task1_single_triage",
+      "difficulty": "easy",
+      "episode_id": "14b8d0c2-4ac1-490b-bceb-2fb22d8aefd2",
+      "seed": 42,
+      "session_id": "agent-task1_single_triage-8a1c61",
+      "mode": "hybrid",
+      "final_score": 0.623,
+      "baseline": 0.61,
+      "beats_baseline": true,
+      "delta_vs_baseline": 0.013,
+      "total_steps": 3,
+      "total_reward": 0.0,
+      "grader_status": "success",
+      "grader_components": {
+        "triage_class": 0.2,
+        "unit_type": 0.165,
+        "hospital_match": 0.258
+      },
+      "grader_penalties": [],
+      "p1_survival_rate": 1.0,
+      "protocol_violations": 0,
+      "total_llm_tokens": 2789,
+      "avg_step_latency_ms": 8428.23,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:09:37.617408+00:00"
+    },
+    "task2_hospital_route": {
+      "task_id": "task2_hospital_route",
+      "difficulty": "easy",
+      "episode_id": "76ba6395-6033-4b8b-8d00-7559cbe712ce",
+      "seed": 43,
+      "session_id": "agent-task2_hospital_route-4e9f3b",
+      "mode": "hybrid",
+      "final_score": 0.774,
+      "baseline": 0.72,
+      "beats_baseline": true,
+      "delta_vs_baseline": 0.054,
+      "total_steps": 11,
+      "total_reward": -0.75,
+      "grader_status": "success",
+      "grader_components": {
+        "specialty_match": 0.35,
+        "capacity_check": 0.255,
+        "travel_time": 0.144,
+        "protocol_bonus": 0.025
+      },
+      "grader_penalties": [],
+      "p1_survival_rate": 0.85,
+      "protocol_violations": 0,
+      "total_llm_tokens": 17055,
+      "avg_step_latency_ms": 4994.45,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:10:32.556448+00:00"
+    },
+    "task3_unit_type": {
+      "task_id": "task3_unit_type",
+      "difficulty": "easy",
+      "episode_id": "9ec7e645-9155-4f37-a61a-e0910b8d4410",
+      "seed": 44,
+      "session_id": "agent-task3_unit_type-02b826",
+      "mode": "hybrid",
+      "final_score": 0.3825,
+      "baseline": 0.68,
+      "beats_baseline": false,
+      "delta_vs_baseline": -0.2975,
+      "total_steps": 8,
+      "total_reward": 0.5,
+      "grader_status": "success",
+      "grader_components": {
+        "unit_accuracy": 0.2475,
+        "clinical_justification": 0.03,
+        "equipment_adequacy": 0.075,
+        "resource_efficiency": 0.03
+      },
+      "grader_penalties": [],
+      "p1_survival_rate": 0.85,
+      "protocol_violations": 0,
+      "total_llm_tokens": 1385,
+      "avg_step_latency_ms": 924.78,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:10:39.954772+00:00"
+    },
+    "task4_multi_incident": {
+      "task_id": "task4_multi_incident",
+      "difficulty": "medium",
+      "episode_id": "789dd39f-efe1-4f2a-b80e-e43e5e4342f6",
+      "seed": 45,
+      "session_id": "agent-task4_multi_incident-4500e4",
+      "mode": "hybrid",
+      "final_score": 0.8072,
+      "baseline": 0.44,
+      "beats_baseline": true,
+      "delta_vs_baseline": 0.3672,
+      "total_steps": 14,
+      "total_reward": 1.3307,
+      "grader_status": "success",
+      "grader_components": {
+        "queue_prioritisation": 0.258,
+        "dispatch_efficiency": 0.1202,
+        "resource_allocation": 0.194,
+        "escalation_management": 0.15,
+        "crew_management": 0.085
+      },
+      "grader_penalties": [],
+      "p1_survival_rate": 0.0,
+      "protocol_violations": 0,
+      "total_llm_tokens": 0,
+      "avg_step_latency_ms": 422.36,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:10:45.867830+00:00"
+    },
+    "task5_dynamic_rerouting": {
+      "task_id": "task5_dynamic_rerouting",
+      "difficulty": "medium",
+      "episode_id": "0e239f04-b62c-4b91-82ea-cd36fecdaa7b",
+      "seed": 46,
+      "session_id": "agent-task5_dynamic_rerouting-5181ee",
+      "mode": "hybrid",
+      "final_score": 0.77,
+      "baseline": 0.38,
+      "beats_baseline": true,
+      "delta_vs_baseline": 0.39,
+      "total_steps": 16,
+      "total_reward": 0.4,
+      "grader_status": "success",
+      "grader_components": {
+        "reroute_correctness": 0.27,
+        "net_time_saved": 0.5
+      },
+      "grader_penalties": [],
+      "p1_survival_rate": 1.0,
+      "protocol_violations": 0,
+      "total_llm_tokens": 4435,
+      "avg_step_latency_ms": 2438.34,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:11:24.881314+00:00"
+    },
+    "task6_prepositioning": {
+      "task_id": "task6_prepositioning",
+      "difficulty": "medium",
+      "episode_id": "81c6df3e-2fb0-4eae-9055-2bec558debd2",
+      "seed": 47,
+      "session_id": "agent-task6_prepositioning-35d9d0",
+      "mode": "hybrid",
+      "final_score": 0.5493,
+      "baseline": 0.42,
+      "beats_baseline": true,
+      "delta_vs_baseline": 0.1293,
+      "total_steps": 1,
+      "total_reward": 0.1171,
+      "grader_status": "success",
+      "grader_components": {
+        "zone_coverage": 0.2113,
+        "demand_alignment": 0.1762,
+        "unit_type_distribution": 0.0825,
+        "golden_hour_readiness": 0.0695,
+        "repositioning_efficiency": 0.0599
+      },
+      "grader_penalties": [
+        {
+          "name": "uncovered_critical_Z10",
+          "amount": -0.05,
+          "reason": "Zone Z10 has demand 0.89 (\u2265 0.8) but zero units assigned",
+          "rule_ref": "EMERGI-ENV Rule T6-H3"
+        }
+      ],
+      "p1_survival_rate": 1.0,
+      "protocol_violations": 0,
+      "total_llm_tokens": 1412,
+      "avg_step_latency_ms": 4504.56,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:11:29.385949+00:00"
+    },
+    "task7_mci_start": {
+      "task_id": "task7_mci_start",
+      "difficulty": "hard",
+      "episode_id": "3ed342df-b7a1-4168-9ca0-69e2858682b0",
+      "seed": 48,
+      "session_id": "agent-task7_mci_start-c8f45a",
+      "mode": "hybrid",
+      "final_score": 0.0,
+      "baseline": 0.29,
+      "beats_baseline": false,
+      "delta_vs_baseline": -0.29,
+      "total_steps": 50,
+      "total_reward": 6.7799,
+      "grader_status": "success",
+      "grader_components": {
+        "start_accuracy": 0.0254,
+        "immediate_response": 0.0966,
+        "hospital_distribution": 0.0713,
+        "scene_command": 0.056,
+        "mutual_aid_management": 0.035
+      },
+      "grader_penalties": [
+        {
+          "name": "immediate_unresponded_INC0025",
+          "amount": -0.25,
+          "reason": "Victim INC0025: Immediate tagged as Delayed and never dispatched \u2014 left without care",
+          "rule_ref": "EMERGI-ENV Rule T7-H2"
+        },
+        {
+          "name": "no_multiagency_coordination",
+          "amount": -0.1,
+          "reason": "2 trapped/extrication events but no multi-agency coordination action issued",
+          "rule_ref": "EMERGI-ENV Rule T7-H5"
+        }
+      ],
+      "p1_survival_rate": 0.0,
+      "protocol_violations": 0,
+      "total_llm_tokens": 81496,
+      "avg_step_latency_ms": 6434.78,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:16:51.125066+00:00"
+    },
+    "task8_transfer_cascade": {
+      "task_id": "task8_transfer_cascade",
+      "difficulty": "hard",
+      "episode_id": "da10e26a-e0f3-4d69-8699-750b7cd358fc",
+      "seed": 49,
+      "session_id": "agent-task8_transfer_cascade-28bb2c",
+      "mode": "hybrid",
+      "final_score": 0.0,
+      "baseline": 0.24,
+      "beats_baseline": false,
+      "delta_vs_baseline": -0.24,
+      "total_steps": 40,
+      "total_reward": 18.0,
+      "grader_status": "success",
+      "grader_components": {
+        "transfer_appropriateness": 0.3325,
+        "timing_quality": 0.25,
+        "bed_utilisation": 0.0007,
+        "cascade_avoidance": 0.15,
+        "protocol_compliance": 0.035,
+        "protocol_bonus": 0.04
+      },
+      "grader_penalties": [
+        {
+          "name": "no_pre_alert_PT000",
+          "amount": -0.05,
+          "reason": "PT000: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT001",
+          "amount": -0.05,
+          "reason": "PT001: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT002",
+          "amount": -0.05,
+          "reason": "PT002: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT003",
+          "amount": -0.05,
+          "reason": "PT003: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT004",
+          "amount": -0.05,
+          "reason": "PT004: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT005",
+          "amount": -0.05,
+          "reason": "PT005: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT006",
+          "amount": -0.05,
+          "reason": "PT006: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT007",
+          "amount": -0.05,
+          "reason": "PT007: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT008",
+          "amount": -0.05,
+          "reason": "PT008: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT009",
+          "amount": -0.05,
+          "reason": "PT009: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT010",
+          "amount": -0.05,
+          "reason": "PT010: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT011",
+          "amount": -0.05,
+          "reason": "PT011: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT012",
+          "amount": -0.05,
+          "reason": "PT012: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT013",
+          "amount": -0.05,
+          "reason": "PT013: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT014",
+          "amount": -0.05,
+          "reason": "PT014: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT015",
+          "amount": -0.05,
+          "reason": "PT015: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT016",
+          "amount": -0.05,
+          "reason": "PT016: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT017",
+          "amount": -0.05,
+          "reason": "PT017: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT018",
+          "amount": -0.05,
+          "reason": "PT018: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT019",
+          "amount": -0.05,
+          "reason": "PT019: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT020",
+          "amount": -0.05,
+          "reason": "PT020: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT021",
+          "amount": -0.05,
+          "reason": "PT021: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT022",
+          "amount": -0.05,
+          "reason": "PT022: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT023",
+          "amount": -0.05,
+          "reason": "PT023: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT024",
+          "amount": -0.05,
+          "reason": "PT024: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT025",
+          "amount": -0.05,
+          "reason": "PT025: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT026",
+          "amount": -0.05,
+          "reason": "PT026: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT027",
+          "amount": -0.05,
+          "reason": "PT027: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT028",
+          "amount": -0.05,
+          "reason": "PT028: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT029",
+          "amount": -0.05,
+          "reason": "PT029: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT030",
+          "amount": -0.05,
+          "reason": "PT030: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT031",
+          "amount": -0.05,
+          "reason": "PT031: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT032",
+          "amount": -0.05,
+          "reason": "PT032: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT033",
+          "amount": -0.05,
+          "reason": "PT033: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT034",
+          "amount": -0.05,
+          "reason": "PT034: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT035",
+          "amount": -0.05,
+          "reason": "PT035: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT036",
+          "amount": -0.05,
+          "reason": "PT036: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT037",
+          "amount": -0.05,
+          "reason": "PT037: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT038",
+          "amount": -0.05,
+          "reason": "PT038: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "no_pre_alert_PT039",
+          "amount": -0.05,
+          "reason": "PT039: no pre-alert to H01",
+          "rule_ref": "EMERGI-ENV Transfer Protocol \u00a76.1"
+        },
+        {
+          "name": "over_transfer_PT000",
+          "amount": -0.08,
+          "reason": "PT000: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT001",
+          "amount": -0.08,
+          "reason": "PT001: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT002",
+          "amount": -0.08,
+          "reason": "PT002: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT003",
+          "amount": -0.08,
+          "reason": "PT003: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT004",
+          "amount": -0.08,
+          "reason": "PT004: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT005",
+          "amount": -0.08,
+          "reason": "PT005: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT006",
+          "amount": -0.08,
+          "reason": "PT006: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT007",
+          "amount": -0.08,
+          "reason": "PT007: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT008",
+          "amount": -0.08,
+          "reason": "PT008: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT009",
+          "amount": -0.08,
+          "reason": "PT009: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT010",
+          "amount": -0.08,
+          "reason": "PT010: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT011",
+          "amount": -0.08,
+          "reason": "PT011: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT012",
+          "amount": -0.08,
+          "reason": "PT012: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT013",
+          "amount": -0.08,
+          "reason": "PT013: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT014",
+          "amount": -0.08,
+          "reason": "PT014: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT015",
+          "amount": -0.08,
+          "reason": "PT015: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT016",
+          "amount": -0.08,
+          "reason": "PT016: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT017",
+          "amount": -0.08,
+          "reason": "PT017: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT018",
+          "amount": -0.08,
+          "reason": "PT018: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT019",
+          "amount": -0.08,
+          "reason": "PT019: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT020",
+          "amount": -0.08,
+          "reason": "PT020: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT021",
+          "amount": -0.08,
+          "reason": "PT021: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT022",
+          "amount": -0.08,
+          "reason": "PT022: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT023",
+          "amount": -0.08,
+          "reason": "PT023: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT024",
+          "amount": -0.08,
+          "reason": "PT024: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT025",
+          "amount": -0.08,
+          "reason": "PT025: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT026",
+          "amount": -0.08,
+          "reason": "PT026: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT027",
+          "amount": -0.08,
+          "reason": "PT027: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT028",
+          "amount": -0.08,
+          "reason": "PT028: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT029",
+          "amount": -0.08,
+          "reason": "PT029: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT030",
+          "amount": -0.08,
+          "reason": "PT030: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT031",
+          "amount": -0.08,
+          "reason": "PT031: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT032",
+          "amount": -0.08,
+          "reason": "PT032: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT033",
+          "amount": -0.08,
+          "reason": "PT033: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT034",
+          "amount": -0.08,
+          "reason": "PT034: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT035",
+          "amount": -0.08,
+          "reason": "PT035: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT036",
+          "amount": -0.08,
+          "reason": "PT036: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT037",
+          "amount": -0.08,
+          "reason": "PT037: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT038",
+          "amount": -0.08,
+          "reason": "PT038: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        },
+        {
+          "name": "over_transfer_PT039",
+          "amount": -0.08,
+          "reason": "PT039: stable patient transferred away from H01 (occ=2%)",
+          "rule_ref": "EMERGI-ENV \u00a74.5 Resource Stewardship"
+        }
+      ],
+      "p1_survival_rate": 0.0,
+      "protocol_violations": 0,
+      "total_llm_tokens": 12411,
+      "avg_step_latency_ms": 926.49,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:17:28.184772+00:00"
+    },
+    "task9_surge": {
+      "task_id": "task9_surge",
+      "difficulty": "hard",
+      "episode_id": "396979d3-2f14-43f8-9efb-5780e5dfe3b6",
+      "seed": 50,
+      "session_id": "agent-task9_surge-24d8b8",
+      "mode": "hybrid",
+      "final_score": 0.47,
+      "baseline": 0.17,
+      "beats_baseline": true,
+      "delta_vs_baseline": 0.3,
+      "total_steps": 60,
+      "total_reward": 6.0,
+      "grader_status": "success",
+      "grader_components": {
+        "system_survival": 0.0,
+        "cascade_avoidance": 0.25,
+        "resource_coordination": 0.13,
+        "mci_triage_quality": 0.0,
+        "protocol_adherence": 0.04,
+        "protocol_bonus": 0.05
+      },
+      "grader_penalties": [],
+      "p1_survival_rate": 0.0,
+      "protocol_violations": 0,
+      "total_llm_tokens": 0,
+      "avg_step_latency_ms": 391.22,
+      "cascade_events": 0,
+      "mutual_aid_requests": 0,
+      "surge_declared": false,
+      "error_message": null,
+      "run_timestamp": "2026-04-09T10:17:51.657798+00:00"
+    }
+  }
+}
