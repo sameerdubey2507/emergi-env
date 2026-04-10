@@ -25,6 +25,12 @@ import urllib.request
 import urllib.error
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+import traceback
+
+# Get absolute path regardless of how the script is called
+_HERE = os.path.dirname(os.path.realpath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
 
 # ── UTF-8 stdout (safe) ───────────────────────────────────────────────────────
 try:
@@ -61,7 +67,7 @@ MODEL_NAME:   str   = os.getenv("MODEL_NAME",   "meta-llama/Meta-Llama-3-8B-Inst
 HF_TOKEN:     str   = os.getenv("HF_TOKEN", os.getenv("API_KEY", ""))
 API_KEY:      str   = HF_TOKEN        # alias — always equals HF_TOKEN
 
-SERVER_URL:   str   = os.getenv("SERVER_URL",        "http://127.0.0.1:7860").rstrip("/")
+SERVER_URL: str = os.getenv("SERVER_URL", "https://sameerdubey25-my-env.hf.space")
 MAX_TOKENS:   int   = int(os.getenv("MAX_LLM_TOKENS",    "800"))
 TEMPERATURE:  float = float(os.getenv("LLM_TEMPERATURE", "0.2"))
 LLM_TIMEOUT:  float = float(os.getenv("LLM_TIMEOUT",     "40.0"))
@@ -1111,4 +1117,10 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    import traceback
+    try:
+        sys.exit(main())
+    except Exception:
+        traceback.print_exc(file=sys.stderr)
+        print("[END] success=false steps=0 score=0.00 rewards=", flush=True)
+        sys.exit(1)
