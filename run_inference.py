@@ -28,7 +28,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     except (AttributeError, io.UnsupportedOperation):
         pass
 
-ROOT = Path(__file__).parent
+ROOT = Path(os.path.realpath(__file__)).parent
 SERVER_PORT = int(os.getenv("PORT", "7860"))
 SERVER_URL  = f"http://localhost:{SERVER_PORT}"
 HEALTH_URL  = f"{SERVER_URL}/health"

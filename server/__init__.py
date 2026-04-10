@@ -178,7 +178,7 @@ if _PYDANTIC_AVAILABLE:
         log_level: str = Field(default="INFO")
         log_renderer: LogRenderer = Field(default=LogRenderer.JSON)
         data_dir: Path = Field(
-            default=Path(__file__).parent.parent / "data",
+            default=Path(os.path.realpath(__file__)).parent.parent / "data",
             description="Root directory for JSON data files",
         )
         @field_validator("log_level", mode="before")

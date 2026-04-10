@@ -2,6 +2,7 @@ from __future__ import annotations
 import heapq
 import json
 import math
+import os
 import random
 import uuid
 from dataclasses import dataclass, field
@@ -9,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, FrozenSet, List, Optional, Set, Tuple
 import numpy as np
-_HERE = Path(__file__).resolve().parent
+_HERE    = Path(os.path.realpath(__file__)).parent
 DATA_DIR = _HERE.parent.parent / "data"
 STEP_DURATION_MINUTES: float = 3.0        
 PEAK_AM = (8.0, 10.0)

@@ -9,7 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Set, Tuple
 import numpy as np
-_HERE    = Path(__file__).resolve().parent
+_HERE    = Path(os.path.realpath(__file__)).parent
 DATA_DIR = _HERE.parent.parent / "data"
 STEP_DURATION_MINUTES: float = 3.0
 DIVERSION_ER_THRESHOLD:      float = 0.90   

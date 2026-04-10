@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import logging
+import os
 import random
 import time
 import uuid
@@ -117,7 +118,7 @@ SIMULATION_DESC:    str   = (
     "India 108/112 EMS reinforcement-learning environment — "
     "Pune-inspired 12-zone city, 8 hospitals, 9 tasks."
 )
-_HERE    = Path(__file__).resolve().parent
+_HERE    = Path(os.path.realpath(__file__)).parent
 DATA_DIR = _HERE.parent.parent / "data"
 logger = logging.getLogger(__name__)
 STEP_DURATION_MINUTES: float = 3.0

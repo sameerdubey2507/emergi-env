@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import math
+import os
 import random
 import uuid
 from copy import deepcopy
@@ -9,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 import numpy as np
-_HERE    = Path(__file__).resolve().parent
+_HERE    = Path(os.path.realpath(__file__)).parent
 DATA_DIR = _HERE.parent.parent / "data"
 MAX_ACTIVE_INCIDENTS   = 80      
 MCI_VICTIM_MIN         = 20

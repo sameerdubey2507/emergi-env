@@ -48,7 +48,7 @@ except Exception:
 
 # ── Load .env (optional, never crashes) ───────────────────────────────────────
 try:
-    _env_path = Path(__file__).parent / ".env"
+    _env_path = Path(os.path.realpath(__file__)).parent / ".env"
     if _env_path.exists():
         with open(_env_path, encoding="utf-8", errors="replace") as _f:
             for _line in _f:
@@ -67,7 +67,7 @@ MODEL_NAME:   str   = os.getenv("MODEL_NAME",   "meta-llama/Meta-Llama-3-8B-Inst
 HF_TOKEN:     str   = os.getenv("HF_TOKEN", os.getenv("API_KEY", ""))
 API_KEY:      str   = HF_TOKEN        # alias — always equals HF_TOKEN
 
-SERVER_URL: str = os.getenv("SERVER_URL", "https://sameerdubey25-my-env.hf.space")
+SERVER_URL: str = os.getenv("SERVER_URL", "https://sameerdubey2507-emergi-env.hf.space").rstrip("/")
 MAX_TOKENS:   int   = int(os.getenv("MAX_LLM_TOKENS",    "800"))
 TEMPERATURE:  float = float(os.getenv("LLM_TEMPERATURE", "0.2"))
 LLM_TIMEOUT:  float = float(os.getenv("LLM_TIMEOUT",     "40.0"))

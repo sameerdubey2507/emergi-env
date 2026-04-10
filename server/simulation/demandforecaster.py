@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import math
+import os
 import random
 import uuid
 from collections import defaultdict, deque
@@ -10,7 +11,7 @@ from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Set, Tuple
 import numpy as np
 
-_HERE    = Path(__file__).resolve().parent
+_HERE    = Path(os.path.realpath(__file__)).parent
 DATA_DIR = _HERE.parent.parent / "data"
 
 STEP_DURATION_MINUTES: float = 3.0
