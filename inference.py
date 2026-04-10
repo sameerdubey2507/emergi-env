@@ -75,7 +75,7 @@ if not HF_TOKEN:
 
 API_KEY:      str   = HF_TOKEN        # alias — always equals HF_TOKEN
 
-SERVER_URL: str = os.getenv("SERVER_URL", "https://sameerdubey2507-emergi-env.hf.space").rstrip("/")
+SERVER_URL: str = os.getenv("SERVER_URL", "http://localhost:7860").rstrip("/")
 MAX_TOKENS:   int   = int(os.getenv("MAX_LLM_TOKENS",    "800"))
 TEMPERATURE:  float = float(os.getenv("LLM_TEMPERATURE", "0.2"))
 LLM_TIMEOUT:  float = float(os.getenv("LLM_TIMEOUT",     "40.0"))
