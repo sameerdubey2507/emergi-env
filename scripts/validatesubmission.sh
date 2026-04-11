@@ -317,9 +317,14 @@ fi
 ts=$(date +%s%3N)
 if [[ "${SKIP_DOCKER}" == "false" ]]; then
     if command -v docker >/dev/null 2>&1; then
-        DOCKER_VERSION=$(docker --version 2>/dev/null | head -1)
-        DOCKER_INFO=$(docker info 2>/dev/null | grep -E "Server Version|Storage Driver" | head -2 | tr '\n' ' ')
-        check_pass "docker_available" "${DOCKER_VERSION} | ${DOCKER_INFO}" "${ts}"
+        if docker info >/dev/null 2>&1; then
+            DOCKER_VERSION=$(docker --version 2>/dev/null | head -1)
+            DOCKER_INFO=$(docker info 2>/dev/null | grep -E "Server Version|Storage Driver" | head -2 | tr '\n' ' ' || true)
+            check_pass "docker_available" "${DOCKER_VERSION} | ${DOCKER_INFO}" "${ts}"
+        else
+            check_warn "docker_available" "Docker installed but daemon not running — skipping Docker stages"
+            SKIP_DOCKER=true
+        fi
     else
         check_warn "docker_available" "Docker not found — skipping Docker stages"
         SKIP_DOCKER=true
@@ -392,8 +397,12 @@ else
 fi
 
 ts=$(date +%s%3N)
+# pipefail + grep: no matches → exit 1 — disable pipefail for this count
+set +o pipefail
 STUB_FILE_COUNT=$(grep -rl "TODO\|FIXME\|PLACEHOLDER\|NotImplemented\|raise NotImplementedError" \
-    "${PROJECT_ROOT}/server" 2>/dev/null | wc -l | tr -d ' ')
+    "${PROJECT_ROOT}/server" 2>/dev/null | wc -l)
+set -o pipefail
+STUB_FILE_COUNT=$(echo -n "${STUB_FILE_COUNT}" | tr -d ' \n\r\t')
 if [[ "${STUB_FILE_COUNT}" == "0" ]]; then
     check_pass "no_stubs" "No TODO/FIXME/NotImplemented stubs detected in server/" "${ts}"
 else
@@ -410,9 +419,10 @@ log_head "STAGE 2 — openenv.yaml Deep Validation"
 YAML_FILE="${PROJECT_ROOT}/openenv.yaml"
 if [[ -f "${YAML_FILE}" ]]; then
     ts=$(date +%s%3N)
-    python3 << PYEOF
+    # Run from PROJECT_ROOT so open('openenv.yaml') works on Windows Git Bash (/c/... is not a valid Win32 path for CPython)
+    ( cd "${PROJECT_ROOT}" && python3 << PYEOF
 import sys, os
-sys.path.insert(0, '${PROJECT_ROOT}')
+sys.path.insert(0, os.getcwd())
 
 try:
     import yaml
@@ -424,7 +434,7 @@ except ImportError:
 errors = []
 warnings = []
 
-with open('${YAML_FILE}') as f:
+with open('openenv.yaml') as f:
     config = yaml.safe_load(f)
 
 for field in ['name', 'version', 'description', 'tasks']:
@@ -530,6 +540,7 @@ if errors:
 print('  PASS:openenv.yaml fully valid')
 sys.exit(0)
 PYEOF
+    )
     YAML_EXIT=$?
     if [[ ${YAML_EXIT} -eq 0 ]]; then
         check_pass "openenv_yaml_schema" "9 tasks, difficulty tags, action/obs/reward schema valid" "${ts}"
@@ -545,7 +556,8 @@ log_head "STAGE 3 — requirements.txt & Dependency Audit"
 REQ_FILE="${PROJECT_ROOT}/requirements.txt"
 if [[ -f "${REQ_FILE}" ]]; then
     ts=$(date +%s%3N)
-    PKG_COUNT=$(grep -cE "^[a-zA-Z]" "${REQ_FILE}" || echo 0)
+    PKG_COUNT=$(grep -cE "^[a-zA-Z]" "${REQ_FILE}" || true)
+    PKG_COUNT=$(echo -n "${PKG_COUNT}" | tr -d ' \n\r\t')
     MISSING_PKGS=0
     for pkg in "fastapi" "uvicorn" "pydantic" "numpy" "pytest" "openai"; do
         if ! grep -qi "^${pkg}" "${REQ_FILE}"; then
@@ -558,8 +570,10 @@ if [[ -f "${REQ_FILE}" ]]; then
     fi
 
     ts=$(date +%s%3N)
-    UNPINNED=$(grep -cE "^[a-zA-Z][^=<>!~]*$" "${REQ_FILE}" || echo 0)
-    HAS_PINNED=$(grep -cE "==[0-9]" "${REQ_FILE}" || echo 0)
+    UNPINNED=$(grep -cE "^[a-zA-Z][^=<>!~]*$" "${REQ_FILE}" || true)
+    HAS_PINNED=$(grep -cE "==[0-9]" "${REQ_FILE}" || true)
+    UNPINNED=$(echo -n "${UNPINNED}" | tr -d ' \n\r\t')
+    HAS_PINNED=$(echo -n "${HAS_PINNED}" | tr -d ' \n\r\t')
     if (( UNPINNED > 0 )); then
         check_warn "requirements_pinning" "${UNPINNED} unpinned packages — pin versions for reproducibility"
     else
@@ -598,21 +612,20 @@ if [[ -f "${DOCKERFILE}" ]]; then
     fi
 
     ts=$(date +%s%3N)
-    if echo "${DOCKERFILE_CONTENT}" | grep -q "EXPOSE 7860"; then
-        check_pass "dockerfile_port_7860" "EXPOSE 7860 — HuggingFace Spaces compliant" "${ts}"
+    if echo "${DOCKERFILE_CONTENT}" | grep -qE 'EXPOSE[[:space:]]+7860|EXPOSE[[:space:]]+\$\{PORT\}'; then
+        check_pass "dockerfile_port_7860" "EXPOSE 7860 or EXPOSE \${PORT} — HuggingFace Spaces compliant" "${ts}"
     else
-        check_fail "dockerfile_port_7860" "EXPOSE 7860 is required for HuggingFace Spaces"
+        check_fail "dockerfile_port_7860" "EXPOSE 7860 (or EXPOSE \${PORT} with PORT=7860) is required"
     fi
 
     ts=$(date +%s%3N)
     if echo "${DOCKERFILE_CONTENT}" | grep -q "uvicorn"; then
-        UVICORN_CMD=$(echo "${DOCKERFILE_CONTENT}" | grep "uvicorn" | head -1)
-        if echo "${UVICORN_CMD}" | grep -q "\-\-host 0\.0\.0\.0"; then
+        if echo "${DOCKERFILE_CONTENT}" | grep -qE '\-\-host.*0\.0\.0\.0'; then
             check_pass "dockerfile_uvicorn_host" "uvicorn bound to 0.0.0.0 — correct" "${ts}"
         else
             check_warn "dockerfile_uvicorn_host" "uvicorn may not bind to 0.0.0.0 — required for container networking"
         fi
-        if echo "${UVICORN_CMD}" | grep -qE "\-\-port 7860|\-\-port=7860"; then
+        if echo "${DOCKERFILE_CONTENT}" | grep -qE "\-\-port[[:space:]]+7860|\-\-port=7860|\-\-port\",[[:space:]]*\"7860"; then
             check_pass "dockerfile_uvicorn_port" "uvicorn port 7860 explicit" "${ts}"
         else
             check_warn "dockerfile_uvicorn_port" "uvicorn port not explicitly 7860 in CMD/ENTRYPOINT"
