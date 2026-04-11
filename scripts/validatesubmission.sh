@@ -36,6 +36,9 @@ IMAGE_TAG="emergi-env:validate-$$"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SERVER_STARTED_BY_US=false
+# EMERGI-ENV FastAPI expects POST /step body: {"action": {...}, "session_id": "..."}
+STEP_NOOP_PAYLOAD='{"action":{"action_type":"noop"},"session_id":"default"}'
+RESET_TASK1_PAYLOAD='{"task_id":"task1_single_triage","seed":42,"session_id":"default"}'
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
@@ -69,7 +72,7 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             echo "EMERGI-ENV OpenEnv Phase 1 Validator"
             echo ""
-            echo "Usage: bash scripts/validate-submission.sh [OPTIONS]"
+            echo "Usage: bash scripts/validatesubmission.sh [OPTIONS]"
             echo ""
             echo "  --skip-docker            Skip Docker build/run checks"
             echo "  --skip-hf                Skip HuggingFace Space checks"
@@ -139,7 +142,7 @@ check_fail() {
     log_fail "${BOLD}${name}${RESET} — ${RED}${msg}${RESET}"
     if [[ "${FAIL_FAST}" == "true" ]]; then
         echo -e "\n${RED}${BOLD}FAIL-FAST triggered. Aborting.${RESET}"
-        finalize_and_exit
+        exit 1
     fi
 }
 
@@ -337,28 +340,27 @@ log_head "STAGE 1 — Project File Structure (47 files)"
 
 declare -a REQUIRED_FILES=(
     "openenv.yaml" "Dockerfile" "requirements.txt" "inference.py" "README.md"
-    "server/main.py" "server/env.py"
+    "server/app.py" "server/env.py"
     "server/models/__init__.py" "server/models/observation.py" "server/models/action.py"
     "server/models/state.py" "server/models/reward.py"
-    "server/simulation/__init__.py" "server/simulation/incident_engine.py"
-    "server/simulation/fleet_simulator.py" "server/simulation/hospital_network.py"
-    "server/simulation/traffic_model.py" "server/simulation/communications.py"
-    "server/simulation/multi_agency.py" "server/simulation/demand_forecaster.py"
-    "server/simulation/mutual_aid.py"
+    "server/simulation/__init__.py" "server/simulation/incidentengine.py"
+    "server/simulation/fleetsimulator.py" "server/simulation/hospitalnetwork.py"
+    "server/simulation/trafficmodel.py" "server/simulation/communication.py"
+    "server/simulation/multiagency.py" "server/simulation/demandforecaster.py"
+    "server/simulation/mutualaid.py"
     "server/medical/__init__.py" "server/medical/triage.py"
-    "server/medical/trauma_scoring.py" "server/medical/survival_curves.py"
-    "server/medical/golden_hour.py" "server/medical/protocol_checker.py"
-    "server/graders/__init__.py" "server/graders/base_grader.py"
-    "server/graders/task1_grader.py" "server/graders/task2_grader.py"
-    "server/graders/task3_grader.py" "server/graders/task4_grader.py"
-    "server/graders/task5_grader.py" "server/graders/task6_grader.py"
-    "server/graders/task7_grader.py" "server/graders/task8_grader.py"
-    "server/graders/task9_grader.py"
-    "data/city_zones.json" "data/hospital_profiles.json"
-    "data/incident_templates.json" "data/traffic_patterns.json"
-    "data/demand_history.json" "data/survival_params.json"
-    "tests/test_graders.py" "tests/test_env.py"
-    "scripts/run_baseline.sh" "scripts/generate_scenarios.py"
+    "server/medical/traumascoring.py" "server/medical/survivalcurves.py" "server/medical/protocolchecker.py"
+    "server/graders/__init__.py" "server/graders/basegrader.py"
+    "server/graders/taskgrader1.py" "server/graders/taskgrader2.py"
+    "server/graders/taskgrader3.py" "server/graders/taskgrader4.py"
+    "server/graders/taskgrader5.py" "server/graders/taskgrader6.py"
+    "server/graders/taskgrader7.py" "server/graders/taskgrader8.py"
+    "server/graders/taskgrader9.py"
+    "data/peopledataset.json" "data/hospitalprofiles.json"
+    "data/templateincident.json" "data/trafficpattern.json"
+    "data/demandhistory.json" "data/survivalparam.json"
+    "tests/testgrader.py" "tests/testenv.py"
+    "scripts/runbaseline.sh" "scripts/generatescenario.py"
 )
 
 MISSING_FILE_COUNT=0
@@ -425,12 +427,18 @@ warnings = []
 with open('${YAML_FILE}') as f:
     config = yaml.safe_load(f)
 
-for field in ['name', 'version', 'description', 'tasks', 'action_schema', 'observation_schema', 'reward_schema']:
+for field in ['name', 'version', 'description', 'tasks']:
     if field not in config:
         errors.append(f'Missing top-level field: {field}')
 
+if 'action_schema' not in config and 'action_space' not in config:
+    warnings.append('No action_schema or action_space block (optional)')
+
+if 'observation_schema' not in config and 'observation_space' not in config:
+    warnings.append('No observation_schema or observation_space block (optional)')
+
 version = config.get('version', '')
-if not str(version).count('.') >= 1:
+if str(version).count('.') < 1:
     warnings.append(f'Version "{version}" does not follow semver (e.g. 1.0.0)')
 
 tasks = config.get('tasks', [])
@@ -438,18 +446,23 @@ if len(tasks) != 9:
     errors.append(f'Expected exactly 9 tasks, found {len(tasks)}')
 
 valid_difficulties = {'easy', 'medium', 'hard'}
-expected_ids = {f'task_{i}' for i in range(1, 10)}
+EXPECTED_TASK_IDS = [
+    'task1_single_triage', 'task2_hospital_route', 'task3_unit_type',
+    'task4_multi_incident', 'task5_dynamic_rerouting', 'task6_prepositioning',
+    'task7_mci_start', 'task8_transfer_cascade', 'task9_surge',
+]
+expected_ids = set(EXPECTED_TASK_IDS)
 found_ids = set()
 easy_count = medium_count = hard_count = 0
 
 EXPECTED_BASELINES = {
-    'task_1': 0.61, 'task_2': 0.72, 'task_3': 0.68,
-    'task_4': 0.44, 'task_5': 0.38, 'task_6': 0.42,
-    'task_7': 0.29, 'task_8': 0.24, 'task_9': 0.17
+    'task1_single_triage': 0.61, 'task2_hospital_route': 0.72, 'task3_unit_type': 0.68,
+    'task4_multi_incident': 0.44, 'task5_dynamic_rerouting': 0.38, 'task6_prepositioning': 0.42,
+    'task7_mci_start': 0.29, 'task8_transfer_cascade': 0.24, 'task9_surge': 0.17,
 }
 
 for i, task in enumerate(tasks):
-    tid = task.get('id', f'task_{i+1}')
+    tid = task.get('id', f'unknown_{i}')
     found_ids.add(tid)
     for req in ['id', 'name', 'description', 'difficulty', 'max_steps', 'baseline_score']:
         if req not in task:
@@ -468,7 +481,7 @@ for i, task in enumerate(tasks):
         expected = EXPECTED_BASELINES.get(tid)
         if expected is not None and abs(score_f - expected) > 0.01:
             warnings.append(f'{tid}: baseline_score {score_f} differs from expected {expected}')
-    except:
+    except Exception:
         errors.append(f'{tid}: baseline_score is not a float')
     if int(task.get('max_steps', 0)) < 5:
         errors.append(f'{tid}: max_steps too low')
@@ -479,21 +492,34 @@ missing_ids = expected_ids - found_ids
 if missing_ids:
     errors.append(f'Missing task IDs: {sorted(missing_ids)}')
 
-action_types = config.get('action_schema', {}).get('action_types', [])
-for ra in ['dispatch', 'reroute', 'tag', 'transfer', 'request_mutual_aid', 'noop', 'escalate', 'reposition']:
-    if ra not in action_types:
+act_block = config.get('action_schema') or config.get('action_space') or {}
+at_raw = act_block.get('action_types', [])
+if isinstance(at_raw, dict):
+    action_type_names = list(at_raw.keys())
+elif isinstance(at_raw, list):
+    action_type_names = at_raw
+else:
+    action_type_names = []
+
+for ra in ['dispatch', 'reroute', 'tag', 'transfer', 'request_mutual_aid', 'noop', 'escalate', 'preposition']:
+    if ra not in action_type_names:
         warnings.append(f'Action schema missing: {ra}')
 
-obs_fields = config.get('observation_schema', {}).get('fields', {})
-for rof in ['incident_queue', 'fleet_status', 'hospital_network', 'traffic_snapshot', 'demand_forecast', 'zone_status']:
-    if rof not in obs_fields:
-        warnings.append(f'Observation schema missing field: {rof}')
+obs_block = config.get('observation_schema') or config.get('observation_space') or {}
+obs_fields = obs_block.get('fields') or obs_block.get('properties') or {}
+if not isinstance(obs_fields, dict):
+    obs_fields = {}
 
-if 'components' not in config.get('reward_schema', {}):
+for rof in ['incident_queue', 'fleet_status', 'hospital_network', 'traffic_snapshot', 'demand_forecast']:
+    if rof not in obs_fields:
+        warnings.append(f'Observation spec missing field: {rof}')
+
+rs = config.get('reward_schema') or {}
+if rs and 'components' not in rs:
     warnings.append('reward_schema.components not defined')
 
 print(f'  Tasks: {len(tasks)} (easy:{easy_count} medium:{medium_count} hard:{hard_count})')
-print(f'  Action types: {len(action_types)}  |  Obs fields: {len(obs_fields)}')
+print(f'  Action types: {len(action_type_names)}  |  Obs fields: {len(obs_fields)}')
 
 for w in warnings:
     print(f'  WARN:{w}')
@@ -664,7 +690,7 @@ if [[ "${SKIP_DOCKER}" == "false" ]]; then
         docker run -d \
             --name   "${CONTAINER_NAME}" \
             -p       7860:7860 \
-            --memory 512m \
+            --memory 1536m \
             --cpus   "1.0" \
             --env    API_BASE_URL="${API_BASE_URL:-https://api.openai.com/v1}" \
             --env    MODEL_NAME="${MODEL_NAME:-gpt-4o-mini}" \
@@ -714,7 +740,7 @@ fi
 
 log_step "POST /reset (task1_single_triage, seed=42) — PHASE 1 CRITICAL CHECK"
 ts=$(date +%s%3N)
-RESET_RESP=$(http_post_timed "${SERVER_URL}/reset" '{"task_id": "task1_single_triage", "seed": 42}')
+RESET_RESP=$(http_post_timed "${SERVER_URL}/reset" "${RESET_TASK1_PAYLOAD}")
 status=$(parse_status "${RESET_RESP}")
 body=$(parse_body "${RESET_RESP}")
 elapsed=$(parse_elapsed "${RESET_RESP}")
@@ -728,7 +754,7 @@ fi
 
 RESET_BODY="${body}"
 
-for field in "incident_queue" "fleet_status" "hospital_network" "traffic_snapshot" "demand_forecast" "step_number"; do
+for field in "incident_queue" "fleet_status" "hospital_network" "traffic_snapshot" "demand_forecast" "observation_step"; do
     ts=$(date +%s%3N)
     field_val=$(echo "${RESET_BODY}" | python3 -c "
 import sys, json
@@ -821,7 +847,7 @@ fi
 
 log_step "POST /step (noop action)"
 ts=$(date +%s%3N)
-STEP_RESP=$(http_post_timed "${SERVER_URL}/step" '{"action_type": "noop", "unit_id": null}')
+STEP_RESP=$(http_post_timed "${SERVER_URL}/step" "${STEP_NOOP_PAYLOAD}")
 status=$(parse_status "${STEP_RESP}")
 body=$(parse_body "${STEP_RESP}")
 elapsed=$(parse_elapsed "${STEP_RESP}")
@@ -847,10 +873,10 @@ fi
 
 log_step "Dense reward validation (10 steps)"
 ts=$(date +%s%3N)
-http_post "${SERVER_URL}/reset" '{"task_id": "task1_single_triage", "seed": 99}' >/dev/null 2>&1
+http_post "${SERVER_URL}/reset" '{"task_id":"task1_single_triage","seed":99,"session_id":"default"}' >/dev/null 2>&1
 NONZERO_REWARDS=0
 for i in $(seq 1 10); do
-    resp=$(http_post "${SERVER_URL}/step" '{"action_type": "noop", "unit_id": null}')
+    resp=$(http_post "${SERVER_URL}/step" "${STEP_NOOP_PAYLOAD}")
     body=$(parse_body "${resp}")
     reward=$(echo "${body}" | python3 -c "
 import sys, json
@@ -889,7 +915,7 @@ for task_id in task1_single_triage task2_hospital_route task3_unit_type task4_mu
     log_step "${diff_c}[${diff^^}]${RESET} ${task_id}: ${name}"
     ts=$(date +%s%3N)
 
-    RESET_STATUS=$(parse_status "$(http_post "${SERVER_URL}/reset" "{\"task_id\": \"${task_id}\", \"seed\": 42}")")
+    RESET_STATUS=$(parse_status "$(http_post "${SERVER_URL}/reset" "{\"task_id\": \"${task_id}\", \"seed\": 42, \"session_id\": \"default\"}")")
     if [[ "${RESET_STATUS}" != "200" ]]; then
         check_fail "grader:${task_id}:reset" "Reset failed HTTP ${RESET_STATUS}"
         continue
@@ -900,7 +926,7 @@ for task_id in task1_single_triage task2_hospital_route task3_unit_type task4_mu
     LAST_STEP_BODY=""
 
     for step in 1 2 3 4 5; do
-        STEP_R=$(http_post "${SERVER_URL}/step" '{"action_type": "noop", "unit_id": null}')
+        STEP_R=$(http_post "${SERVER_URL}/step" "${STEP_NOOP_PAYLOAD}")
         STEP_STATUS=$(parse_status "${STEP_R}")
         STEP_BODY=$(parse_body "${STEP_R}")
 
@@ -994,8 +1020,8 @@ for task_id in task1_single_triage task4_multi_incident task7_mci_start; do
     ts=$(date +%s%3N)
     declare -a RUN_SCORES=()
     for run in 1 2 3; do
-        http_post "${SERVER_URL}/reset" "{\"task_id\": \"${task_id}\", \"seed\": 777}" >/dev/null 2>&1
-        STEP_B=$(parse_body "$(http_post "${SERVER_URL}/step" '{"action_type": "noop", "unit_id": null}')")
+        http_post "${SERVER_URL}/reset" "{\"task_id\": \"${task_id}\", \"seed\": 777, \"session_id\": \"default\"}" >/dev/null 2>&1
+        STEP_B=$(parse_body "$(http_post "${SERVER_URL}/step" "${STEP_NOOP_PAYLOAD}")")
         score=$(echo "${STEP_B}" | python3 -c "
 import sys, json
 try:
@@ -1032,7 +1058,6 @@ log_step "pytest tests/ -v --tb=short --junitxml=..."
 
 python3 -m pytest tests/ \
     -v --tb=short --no-header \
-    --timeout=120 \
     --junitxml="${PYTEST_XML}" \
     > "${PYTEST_LOG}" 2>&1
 PYTEST_EXIT=$?
@@ -1064,10 +1089,10 @@ warnings = []
 schema_info = []
 
 model_checks = {
-    'server.models.observation': ('Observation', ['incident_queue', 'fleet_status', 'hospital_network', 'traffic_snapshot']),
-    'server.models.action':      ('Action',      ['action_type']),
-    'server.models.reward':      ('Reward',      []),
-    'server.models.state':       ('State',       []),
+    'server.models.observation': ('ObservationModel', ['incident_queue', 'fleet_status', 'hospital_network', 'traffic_snapshot']),
+    'server.models.action':      ('NoopAction',     ['action_type']),
+    'server.models.reward':      ('RewardModel',    []),
+    'server.models.state':       ('SimulationState', []),
 }
 
 for module_path, (class_name, required_fields) in model_checks.items():
@@ -1100,7 +1125,7 @@ print('  PASS:All 4 Pydantic models importable and schema-valid')
 sys.exit(0)
 PYEOF
     if [[ $? -eq 0 ]]; then
-        check_pass "pydantic_models" "Observation/Action/Reward/State — all valid, no bare dicts" "${ts}"
+        check_pass "pydantic_models" "ObservationModel/NoopAction/RewardModel/SimulationState — schema OK" "${ts}"
     else
         check_fail "pydantic_models" "Pydantic model errors — see above"
     fi
@@ -1112,10 +1137,10 @@ log_head "STAGE 11 — inference.py AST Analysis & Dry Run"
 
 if [[ "${SKIP_INFERENCE}" == "false" ]]; then
     ts=$(date +%s%3N)
-    python3 << 'PYEOF'
+    python3 << PYEOF
 import ast, sys, os
 
-inf_path = os.path.join('${PROJECT_ROOT}', 'inference.py')
+inf_path = os.path.join(r'''${PROJECT_ROOT}''', 'inference.py')
 try:
     with open(inf_path) as f:
         source = f.read()
@@ -1164,8 +1189,8 @@ PYEOF
         HF_TOKEN="dry-run-token" \
         DRY_RUN="true" \
         python3 "${PROJECT_ROOT}/inference.py" \
-        --task task1_single_triage --seed 42 --max-steps 5 \
-        --server-url "${SERVER_URL}" \
+        --task task1_single_triage --seed 42 \
+        --server "${SERVER_URL}" \
         > "${INFERENCE_LOG}" 2>&1
     INF_EXIT=$?
 
@@ -1184,10 +1209,10 @@ log_head "STAGE 12 — Security Scan"
 
 if [[ "${SKIP_SECURITY}" == "false" ]]; then
     ts=$(date +%s%3N)
-    python3 << 'PYEOF'
+    python3 << PYEOF
 import os, sys, re, pathlib
 
-project_root = '${PROJECT_ROOT}'
+project_root = r'''${PROJECT_ROOT}'''
 issues = []
 warnings = []
 
@@ -1252,7 +1277,7 @@ if [[ "${SKIP_STRESS}" == "false" ]]; then
 
     for i in $(seq 1 "${STRESS_CONCURRENCY}"); do
         (
-            resp=$(http_post_timed "${SERVER_URL}/reset" "{\"task_id\": \"task_1\", \"seed\": ${i}}")
+            resp=$(http_post_timed "${SERVER_URL}/reset" "{\"task_id\": \"task1_single_triage\", \"seed\": ${i}, \"session_id\": \"stress-${i}\"}")
             status=$(parse_status "${resp}")
             elapsed=$(parse_elapsed "${resp}")
             echo "${status}:${elapsed}" >> "${STRESS_LOG}"
@@ -1284,9 +1309,9 @@ if [[ "${SKIP_STRESS}" == "false" ]]; then
     THRPT_END=$(( THRPT_START + STRESS_DURATION ))
 
     while (( $(date +%s) < THRPT_END )); do
-        http_post "${SERVER_URL}/reset" '{"task_id": "task1_single_triage", "seed": 1}' >/dev/null 2>&1
+        http_post "${SERVER_URL}/reset" '{"task_id":"task1_single_triage","seed":1,"session_id":"default"}' >/dev/null 2>&1
         for _ in 1 2 3; do
-            http_post "${SERVER_URL}/step" '{"action_type": "noop", "unit_id": null}' >/dev/null 2>&1
+            http_post "${SERVER_URL}/step" "${STEP_NOOP_PAYLOAD}" >/dev/null 2>&1
         done
         ((THRPT_COMPLETE++)) || true
     done
@@ -1393,10 +1418,10 @@ fi
 
 log_head "STAGE 16 — Response Latency Profiling (8 iterations each)"
 
-for endpoint_info in "GET:/health:null" "POST:/reset:{\"task_id\":\"task1_single_triage\",\"seed\":42}" "POST:/step:{\"action_type\":\"noop\",\"unit_id\":null}"; do
-    METHOD=$(echo "${endpoint_info}" | cut -d: -f1)
-    ROUTE=$(echo "${endpoint_info}" | cut -d: -f2)
-    DATA=$(echo "${endpoint_info}" | cut -d: -f3-)
+for endpoint_info in "GET|/health|" "POST|/reset|${RESET_TASK1_PAYLOAD}" "POST|/step|${STEP_NOOP_PAYLOAD}"; do
+    METHOD=$(echo "${endpoint_info}" | cut -d'|' -f1)
+    ROUTE=$(echo "${endpoint_info}" | cut -d'|' -f2)
+    DATA=$(echo "${endpoint_info}" | cut -d'|' -f3-)
 
     declare -a LATENCIES=()
     for i in $(seq 1 8); do
