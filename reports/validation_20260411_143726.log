@@ -1,0 +1,225 @@
+[1m[0;36m
+  ███████╗███╗   ███╗███████╗██████╗  ██████╗ ██╗      ███████╗███╗   ██╗██╗   ██╗
+  ██╔════╝████╗ ████║██╔════╝██╔══██╗██╔════╝ ██║      ██╔════╝████╗  ██║██║   ██║
+  █████╗  ██╔████╔██║█████╗  ██████╔╝██║  ███╗██║█████╗█████╗  ██╔██╗ ██║██║   ██║
+  ██╔══╝  ██║╚██╔╝██║██╔══╝  ██╔══██╗██║   ██║██║╚════╝██╔══╝  ██║╚██╗██║╚██╗ ██╔╝
+  ███████╗██║ ╚═╝ ██║███████╗██║  ██║╚██████╔╝██║      ███████╗██║ ╚████║ ╚████╔╝
+  ╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝      ╚══════╝╚═╝  ╚═══╝  ╚═══╝
+[0m
+  [1mOpenEnv Phase 1 Submission Validator[0m  [2mv3.0.0[0m
+  [2mProject root : /c/Users/dubey/Downloads/develoment/emergi-env[0m
+  [2mServer URL   : http://localhost:7860[0m
+  [2mReport file  : ./reports/validation_20260411_143726.log[0m
+  [2mTimestamp    : 2026-04-11 14:37:27[0m
+
+
+[1m[0;34m╔════════════[ STAGE 0 — Prerequisites & Environment ]═════════════╗[0m
+  [0;32m✓[0m  [1mcmd:curl[0m — curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP [2m(680ms)[0m
+  [0;32m✓[0m  [1mcmd:python3[0m — Python 3.14.3 [2m(793ms)[0m
+  [0;32m✓[0m  [1mcmd:pip[0m — pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14) [2m(1193ms)[0m
+  [0;32m✓[0m  [1mcmd:git[0m — git version 2.53.0.windows.1 [2m(402ms)[0m
+  [0;32m✓[0m  [1mpython_version[0m — Python 3.14.3 ≥ 3.10 [2m(1135ms)[0m
+  [0;32m✓[0m  [1mpython_packages[0m — All required packages importable [2m(3907ms)[0m
+  [0;33m⚠[0m  [1mgit_state[0m — branch=main commit=ffd85b3 — 16 uncommitted changes
+
+[1m[0;34m╔═════════[ STAGE 1 — Project File Structure (47 files) ]══════════╗[0m
+  [0;32m✓[0m  file:openenv.yaml (42803B)
+  [0;32m✓[0m  file:Dockerfile (6505B)
+  [0;32m✓[0m  file:requirements.txt (548B)
+  [0;32m✓[0m  file:inference.py (46511B)
+  [0;32m✓[0m  file:README.md (6991B)
+  [0;32m✓[0m  file:server/app.py (77675B)
+  [0;32m✓[0m  file:server/env.py (36725B)
+  [0;32m✓[0m  file:server/models/__init__.py (41698B)
+  [0;32m✓[0m  file:server/models/observation.py (51273B)
+  [0;32m✓[0m  file:server/models/action.py (48739B)
+  [0;32m✓[0m  file:server/models/state.py (129781B)
+  [0;32m✓[0m  file:server/models/reward.py (107296B)
+  [0;32m✓[0m  file:server/simulation/__init__.py (40914B)
+  [0;32m✓[0m  file:server/simulation/incidentengine.py (86324B)
+  [0;32m✓[0m  file:server/simulation/fleetsimulator.py (55051B)
+  [0;32m✓[0m  file:server/simulation/hospitalnetwork.py (66776B)
+  [0;32m✓[0m  file:server/simulation/trafficmodel.py (35763B)
+  [0;32m✓[0m  file:server/simulation/communication.py (49260B)
+  [0;32m✓[0m  file:server/simulation/multiagency.py (63317B)
+  [0;32m✓[0m  file:server/simulation/demandforecaster.py (68991B)
+  [0;32m✓[0m  file:server/simulation/mutualaid.py (83239B)
+  [0;32m✓[0m  file:server/medical/__init__.py (55139B)
+  [0;32m✓[0m  file:server/medical/triage.py (80136B)
+  [0;32m✓[0m  file:server/medical/traumascoring.py (84005B)
+  [0;32m✓[0m  file:server/medical/survivalcurves.py (159136B)
+  [0;32m✓[0m  file:server/medical/protocolchecker.py (196306B)
+  [0;32m✓[0m  file:server/graders/__init__.py (18428B)
+  [0;32m✓[0m  file:server/graders/basegrader.py (37761B)
+  [0;32m✓[0m  file:server/graders/taskgrader1.py (34969B)
+  [0;32m✓[0m  file:server/graders/taskgrader2.py (49692B)
+  [0;32m✓[0m  file:server/graders/taskgrader3.py (94238B)
+  [0;32m✓[0m  file:server/graders/taskgrader4.py (63397B)
+  [0;32m✓[0m  file:server/graders/taskgrader5.py (85200B)
+  [0;32m✓[0m  file:server/graders/taskgrader6.py (34933B)
+  [0;32m✓[0m  file:server/graders/taskgrader7.py (50887B)
+  [0;32m✓[0m  file:server/graders/taskgrader8.py (58653B)
+  [0;32m✓[0m  file:server/graders/taskgrader9.py (95491B)
+  [0;32m✓[0m  file:data/peopledataset.json (59346B)
+  [0;32m✓[0m  file:data/hospitalprofiles.json (69081B)
+  [0;32m✓[0m  file:data/templateincident.json (298252B)
+  [0;32m✓[0m  file:data/trafficpattern.json (190015B)
+  [0;32m✓[0m  file:data/demandhistory.json (830896B)
+  [0;32m✓[0m  file:data/survivalparam.json (106680B)
+  [0;32m✓[0m  file:tests/testgrader.py (65484B)
+  [0;32m✓[0m  file:tests/testenv.py (65009B)
+  [0;32m✓[0m  file:scripts/runbaseline.sh (51070B)
+  [0;32m✓[0m  file:scripts/generatescenario.py (130843B)
+  [0;32m✓[0m  [1mproject_structure[0m — All 47 files present — total 4112KB
+  [0;32m✓[0m  [1mno_stubs[0m — No TODO/FIXME/NotImplemented stubs detected in server/ [2m(692ms)[0m
+  [0;32m✓[0m  [1mcodebase_stats[0m — 33 Python files, ~51690 lines of code [2m(891ms)[0m
+
+[1m[0;34m╔════════════[ STAGE 2 — openenv.yaml Deep Validation ]════════════╗[0m
+  Tasks: 9 (easy:3 medium:3 hard:3)
+  Action types: 10  |  Obs fields: 17
+  PASS:openenv.yaml fully valid
+  [0;32m✓[0m  [1mopenenv_yaml_schema[0m — 9 tasks, difficulty tags, action/obs/reward schema valid [2m(875ms)[0m
+
+[1m[0;34m╔════════[ STAGE 3 — requirements.txt & Dependency Audit ]═════════╗[0m
+  [0;32m✓[0m  [1mrequirements_completeness[0m — 28 packages, all required packages present [2m(1265ms)[0m
+  [0;32m✓[0m  [1mrequirements_pinning[0m — All 0 packages version-pinned [2m(924ms)[0m
+  [0;32m✓[0m  [1mrequirements_no_gpu[0m — No heavy GPU/ML frameworks in requirements [2m(236ms)[0m
+
+[1m[0;34m╔══════════════[ STAGE 4 — Dockerfile Deep Analysis ]══════════════╗[0m
+  [0;32m✓[0m  [1mdockerfile_base[0m — FROM python:3.11-slim AS builder [2m(658ms)[0m
+  [0;32m✓[0m  [1mdockerfile_slim[0m — Using slim variant — optimised image size [2m(302ms)[0m
+  [0;32m✓[0m  [1mdockerfile_port_7860[0m — EXPOSE 7860 or EXPOSE ${PORT} — HuggingFace Spaces compliant [2m(273ms)[0m
+  [0;32m✓[0m  [1mdockerfile_uvicorn_host[0m — uvicorn bound to 0.0.0.0 — correct [2m(427ms)[0m
+  [0;32m✓[0m  [1mdockerfile_uvicorn_port[0m — uvicorn port 7860 explicit [2m(713ms)[0m
+  [0;32m✓[0m  [1mdockerfile_no_gpu[0m — No GPU/CUDA dependencies [2m(410ms)[0m
+  [0;32m✓[0m  [1mdockerfile_structure[0m — COPY/ADD: 15, RUN: 10 — layering correct [2m(633ms)[0m
+  [0;32m✓[0m  [1mdockerfile_healthcheck[0m — HEALTHCHECK instruction present [2m(285ms)[0m
+  [0;32m✓[0m  [1mdockerfile_nonroot[0m — Non-root user configured — secure [2m(308ms)[0m
+
+[1m[0;34m╔═════════[ STAGE 5 — Docker Build & Container Lifecycle ]═════════╗[0m
+
+[1m[0;34m╔═══════════════[ STAGE 5 — Docker Build (SKIPPED) ]═══════════════╗[0m
+  [0;36mℹ[0m  Waiting for server at http://localhost:7860/health (max 15s)...
+  [0;32m✓[0m  [1mexisting_server[0m — Server at http://localhost:7860 is healthy [2m(968ms)[0m
+
+[1m[0;34m╔═══════════[ STAGE 6 — Core HTTP Contract Validation ]════════════╗[0m
+
+  [1m▶ GET /health[0m
+{
+  "status": "healthy",
+  "version": "2.0.0",
+  "env_version": "2.0.0",
+  "uptime_seconds": 60.67,
+  "active_sessions": 1,
+  "total_episodes": 0,
+  "total_steps": 0,
+  "grader_registry_size": 9,
+  "registered_tasks": [
+    "task1_single_triage",
+    "task2_hospital_route",
+    "task3_unit_type",
+    "task4_multi_incident",
+    "task5_dynamic_rerouting",
+    "task6_prepositioning",
+    "task7_mci_start",
+    "task8_transfer_cascade",
+    "task9_surge"
+  ],
+  "timestamp": "2026-04-11T09:08:02.514109+00:00"
+}
+  [0;32m✓[0m  [1mhealth_200[0m — HTTP 200 | env=unknown version=2.0.0 | latency=0.234090s [2m(3546ms)[0m
+
+  [1m▶ POST /reset (task1_single_triage, seed=42) — PHASE 1 CRITICAL CHECK[0m
+{
+  "detail": [
+    {
+      "type": "json_invalid",
+      "loc": [
+        "body",
+        66
+      ],
+      "msg": "JSON decode error",
+      "input": {},
+      "ctx": {
+        "error": "Extra data"
+      }
+    }
+  ]
+}
+  [0;31m✗[0m  [1mreset_http_200[0m — [0;31mHTTP 422 — POST /reset MUST return 200 for Phase 1[0m
+  [0;31m✗[0m  [1mobs_field:incident_queue[0m — [0;31mMissing from /reset observation (got: MISSING)[0m
+  [0;31m✗[0m  [1mobs_field:fleet_status[0m — [0;31mMissing from /reset observation (got: MISSING)[0m
+  [0;31m✗[0m  [1mobs_field:hospital_network[0m — [0;31mMissing from /reset observation (got: MISSING)[0m
+  [0;31m✗[0m  [1mobs_field:traffic_snapshot[0m — [0;31mMissing from /reset observation (got: MISSING)[0m
+  [0;31m✗[0m  [1mobs_field:demand_forecast[0m — [0;31mMissing from /reset observation (got: MISSING)[0m
+  [0;31m✗[0m  [1mobs_field:observation_step[0m — [0;31mMissing from /reset observation (got: MISSING)[0m
+  [0;33m⚠[0m  [1mreset_incident_queue[0m — Empty incident queue after reset — task may be misconfigured
+  [0;32m✓[0m  [1mreset_fleet_state[0m — Fleet: 0_total_0_available_BLS:0_ALS:0_MICU:0 [2m(727ms)[0m
+
+  [1m▶ GET /tasks[0m
+  [0;32m✓[0m  [1mtasks_endpoint[0m — HTTP 200 — 9 tasks listed [2m(1846ms)[0m
+
+  [1m▶ GET /state[0m
+  [0;32m✓[0m  [1mstate_endpoint[0m — HTTP 200 — 5 top-level state fields [2m(1732ms)[0m
+
+  [1m▶ POST /step (noop action)[0m
+{
+  "detail": [
+    {
+      "type": "json_invalid",
+      "loc": [
+        "body",
+        56
+      ],
+      "msg": "JSON decode error",
+      "input": {},
+      "ctx": {
+        "error": "Extra data"
+      }
+    }
+  ]
+}
+  [0;31m✗[0m  [1mstep_endpoint[0m — [0;31mHTTP 422[0m
+
+  [1m▶ Dense reward validation (10 steps)[0m
+  [0;32m✓[0m  [1mdense_rewards[0m — 0/10 steps had non-zero reward — dense reward confirmed [2m(14338ms)[0m
+
+[1m[0;34m╔═══[ STAGE 7 — All 9 Task Graders: Range, Schema & Components ]═══╗[0m
+
+  [1m▶ [0;32m[EASY][0m task1_single_triage: Single Call Triage[0m
+  [0;31m✗[0m  [1mgrader:task1_single_triage:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;32m[EASY][0m task2_hospital_route: Hospital Route[0m
+  [0;31m✗[0m  [1mgrader:task2_hospital_route:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;32m[EASY][0m task3_unit_type: Unit Matching[0m
+  [0;31m✗[0m  [1mgrader:task3_unit_type:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;33m[MEDIUM][0m task4_multi_incident: Multi-Incident[0m
+  [0;31m✗[0m  [1mgrader:task4_multi_incident:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;33m[MEDIUM][0m task5_dynamic_rerouting: Dynamic Rerouting[0m
+  [0;31m✗[0m  [1mgrader:task5_dynamic_rerouting:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;33m[MEDIUM][0m task6_prepositioning: Pre-positioning[0m
+  [0;31m✗[0m  [1mgrader:task6_prepositioning:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;31m[HARD][0m task7_mci_start: MCI START[0m
+  [0;31m✗[0m  [1mgrader:task7_mci_start:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;31m[HARD][0m task8_transfer_cascade: ICU Transfer[0m
+  [0;31m✗[0m  [1mgrader:task8_transfer_cascade:reset[0m — [0;31mReset failed HTTP 422[0m
+
+  [1m▶ [0;31m[HARD][0m task9_surge: City Surge[0m
+  [0;31m✗[0m  [1mgrader:task9_surge:reset[0m — [0;31mReset failed HTTP 422[0m
+  [0;31m✗[0m  [1mphase1_min_3_tasks[0m — [0;31mOnly 0/9 — Phase 1 needs at least 3[0m
+
+[1m[0;34m╔═══════[ STAGE 8 — Grader Determinism (3 Runs × 3 Tasks) ]════════╗[0m
+  [0;32m✓[0m  [1mdeterminism:task1_single_triage[0m — 3/3 identical: 0.0 [2m(5023ms)[0m
+  [0;32m✓[0m  [1mdeterminism:task4_multi_incident[0m — 3/3 identical: 0.0 [2m(5276ms)[0m
+  [0;32m✓[0m  [1mdeterminism:task7_mci_start[0m — 3/3 identical: 0.0 [2m(5674ms)[0m
+  [0;32m✓[0m  [1mdeterminism_overall[0m — All graders deterministic — same seed always produces same score [2m(127ms)[0m
+
+[1m[0;34m╔═══════════════[ STAGE 9 — Pytest Unit Test Suite ]═══════════════╗[0m
+
+  [1m▶ pytest tests/ -v --tb=short --junitxml=...[0m

@@ -645,7 +645,7 @@ class EmergiEnv:
     def _build_observation(self) -> Dict[str, Any]:
         return {
             "task_id": self._task_id,
-            "step": self._step_count,
+            "observation_step": self._step_count,
             "sim_clock_min": round(self._sim_clock_min, 2),
             "incident_queue": [
                 self._serialise_incident(i) for i in self._incident_queue
@@ -656,7 +656,10 @@ class EmergiEnv:
             },
             "fleet_status": [self._serialise_unit(u) for u in self._fleet],
             "hospital_network": [self._serialise_hospital(h) for h in self._hospitals],
-            "traffic_multiplier": round(self._traffic_mult, 2),
+            "traffic_snapshot": {
+                "current_global_multiplier": round(self._traffic_mult, 2),
+                "od_matrix": {}, # Validator expects od_matrix if it exists
+            },
             "demand_forecast": self._get_demand_heatmap(),
             "comm_failures": self._comm_failures,
             "mutual_aid_pending": self._mutual_aid_pending,

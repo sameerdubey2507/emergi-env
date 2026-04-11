@@ -706,8 +706,20 @@ async def _grade_async(grader_input: GraderInput) -> GraderResult:
     response_description="Initial observation from the environment",
     status_code=status.HTTP_200_OK,
 )
-async def reset_episode(body: ResetRequest = ResetRequest()) -> JSONResponse:
+async def reset_episode(request: Request) -> JSONResponse:
     t0 = time.monotonic()
+    body_raw = await request.body()
+    try:
+        # Use raw_decode to extract the first JSON object and ignore trailing garbage
+        # which is common when running curl from some Windows/GitBash environments.
+        raw_str = body_raw.decode("utf-8").strip()
+        decoder = json.JSONDecoder()
+        body_dict, _ = decoder.raw_decode(raw_str)
+        body = ResetRequest(**body_dict)
+    except Exception as exc:
+        logger.warning("Reset request aggressive parsing failed: %s", exc)
+        raise HTTPException(status_code=422, detail=f"Aggressive parsing failure (check for trailing garbage): {exc}")
+
     rec = await _sessions.get_or_create(body.session_id)
     try:
         obs = rec.env.reset(
@@ -761,7 +773,18 @@ async def reset_episode(body: ResetRequest = ResetRequest()) -> JSONResponse:
     summary="Submit one action and advance simulation (OpenEnv required)",
     status_code=status.HTTP_200_OK,
 )
-async def step_episode(body: StepRequest) -> JSONResponse:
+async def step_episode(request: Request) -> JSONResponse:
+    body_raw = await request.body()
+    try:
+        # Use raw_decode to extract the first JSON object and ignore trailing garbage
+        raw_str = body_raw.decode("utf-8").strip()
+        decoder = json.JSONDecoder()
+        body_dict, _ = decoder.raw_decode(raw_str)
+        body = StepRequest(**body_dict)
+    except Exception as exc:
+        logger.warning("Step request aggressive parsing failed: %s", exc)
+        raise HTTPException(status_code=422, detail=f"Aggressive parsing failure (check for trailing garbage): {exc}")
+
     rec = await _sessions.require(body.session_id, context="step")
     env = rec.env
     if env.is_done:
