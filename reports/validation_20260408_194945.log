@@ -1,0 +1,23 @@
+[1m[0;36m
+  ███████╗███╗   ███╗███████╗██████╗  ██████╗ ██╗      ███████╗███╗   ██╗██╗   ██╗
+  ██╔════╝████╗ ████║██╔════╝██╔══██╗██╔════╝ ██║      ██╔════╝████╗  ██║██║   ██║
+  █████╗  ██╔████╔██║█████╗  ██████╔╝██║  ███╗██║█████╗█████╗  ██╔██╗ ██║██║   ██║
+  ██╔══╝  ██║╚██╔╝██║██╔══╝  ██╔══██╗██║   ██║██║╚════╝██╔══╝  ██║╚██╗██║╚██╗ ██╔╝
+  ███████╗██║ ╚═╝ ██║███████╗██║  ██║╚██████╔╝██║      ███████╗██║ ╚████║ ╚████╔╝
+  ╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝      ╚══════╝╚═╝  ╚═══╝  ╚═══╝
+[0m
+  [1mOpenEnv Phase 1 Submission Validator[0m  [2mv3.0.0[0m
+  [2mProject root : /c/Users/dubey/Downloads/develoment/emergi-env[0m
+  [2mServer URL   : http://localhost:7860[0m
+  [2mReport file  : ./reports/validation_20260408_194945.log[0m
+  [2mTimestamp    : 2026-04-08 19:49:45[0m
+
+
+[1m[0;34m╔════════════[ STAGE 0 — Prerequisites & Environment ]═════════════╗[0m
+  [0;32m✓[0m  [1mcmd:curl[0m — curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP [2m(1451ms)[0m
+  [0;32m✓[0m  [1mcmd:python3[0m — Python 3.14.3 [2m(986ms)[0m
+  [0;32m✓[0m  [1mcmd:pip[0m — pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14) [2m(5858ms)[0m
+  [0;32m✓[0m  [1mcmd:git[0m — git version 2.53.0.windows.1 [2m(449ms)[0m
+  [0;32m✓[0m  [1mpython_version[0m — Python 3.14.3 ≥ 3.10 [2m(1155ms)[0m
+  [0;32m✓[0m  [1mpython_packages[0m — All required packages importable [2m(20806ms)[0m
+  [0;32m✓[0m  [1mdocker_available[0m — Docker version 29.2.1, build a5c7197 |  Server Version: 29.2.1  Storage Driver: overlayfs  [2m(3398ms)[0m

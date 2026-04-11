@@ -1,0 +1,187 @@
++ trap cleanup EXIT
++ echo -e ''
+
++ cat
+  ███████╗███╗   ███╗███████╗██████╗  ██████╗ ██╗      ███████╗███╗   ██╗██╗   ██╗
+  ██╔════╝████╗ ████║██╔════╝██╔══██╗██╔════╝ ██║      ██╔════╝████╗  ██║██║   ██║
+  █████╗  ██╔████╔██║█████╗  ██████╔╝██║  ███╗██║█████╗█████╗  ██╔██╗ ██║██║   ██║
+  ██╔══╝  ██║╚██╔╝██║██╔══╝  ██╔══██╗██║   ██║██║╚════╝██╔══╝  ██║╚██╗██║╚██╗ ██╔╝
+  ███████╗██║ ╚═╝ ██║███████╗██║  ██║╚██████╔╝██║      ███████╗██║ ╚████║ ╚████╔╝
+  ╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝      ╚══════╝╚═╝  ╚═══╝  ╚═══╝
++ echo -e ''
+
++ echo -e '  OpenEnv Phase 1 Submission Validator  v3.0.0'
+  OpenEnv Phase 1 Submission Validator  v3.0.0
++ echo -e '  Project root : /c/Users/dubey/Downloads/develoment/emergi-env'
+  Project root : /c/Users/dubey/Downloads/develoment/emergi-env
++ echo -e '  Server URL   : http://localhost:7860'
+  Server URL   : http://localhost:7860
++ echo -e '  Report file  : ./reports/validation_20260411_130802.log'
+  Report file  : ./reports/validation_20260411_130802.log
+++ date '+%Y-%m-%d %H:%M:%S'
++ echo -e '  Timestamp    : 2026-04-11 13:08:02'
+  Timestamp    : 2026-04-11 13:08:02
++ echo ''
+
++ log_head 'STAGE 0 — Prerequisites & Environment'
++ local 'title=STAGE 0 — Prerequisites & Environment'
++ local width=66
++ local tlen=37
++ local inner=62
++ local pad_left=12
++ local pad_right=13
++ local lpad
++++ seq 1 12
+++ printf ═%.0s 1 2 3 4 5 6 7 8 9 10 11 12
++ lpad=════════════
++ local rpad
++++ seq 1 13
+++ printf ═%.0s 1 2 3 4 5 6 7 8 9 10 11 12 13
++ rpad=═════════════
++ echo -e '\n╔════════════[ STAGE 0 — Prerequisites & Environment ]═════════════╗'
+
+╔════════════[ STAGE 0 — Prerequisites & Environment ]═════════════╗
++ MISSING_CMDS=()
++ declare -a MISSING_CMDS
++ for cmd in curl python3 pip git
+++ date +%s%3N
++ ts=1775893082967
++ command -v curl
+++ curl --version
+++ head -1
++ ver='curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP'
++ check_pass cmd:curl 'curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP' 1775893082967
++ local name=cmd:curl 'msg=curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP' ts_start=1775893082967
++ (( PASSED_CHECKS++ ))
++ true
++ (( TOTAL_CHECKS++ ))
++ true
++ PASS_MESSAGES+=("✓ ${name}: ${msg}")
++ [[ 1775893082967 != \0 ]]
+++ date +%s%3N
++ local elapsed=383
++ CHECK_DURATIONS["${name}"]=383ms
++ log_pass 'cmd:curl — curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP (383ms)'
++ echo -e '  ✓  cmd:curl — curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP (383ms)'
+  ✓  cmd:curl — curl 8.18.0 (x86_64-w64-mingw32) libcurl/8.18.0 Schannel zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP (383ms)
++ for cmd in curl python3 pip git
+++ date +%s%3N
++ ts=1775893083465
++ command -v python3
+++ python3 --version
+++ head -1
++ ver='Python 3.14.3'
++ check_pass cmd:python3 'Python 3.14.3' 1775893083465
++ local name=cmd:python3 'msg=Python 3.14.3' ts_start=1775893083465
++ (( PASSED_CHECKS++ ))
++ (( TOTAL_CHECKS++ ))
++ PASS_MESSAGES+=("✓ ${name}: ${msg}")
++ [[ 1775893083465 != \0 ]]
+++ date +%s%3N
++ local elapsed=783
++ CHECK_DURATIONS["${name}"]=783ms
++ log_pass 'cmd:python3 — Python 3.14.3 (783ms)'
++ echo -e '  ✓  cmd:python3 — Python 3.14.3 (783ms)'
+  ✓  cmd:python3 — Python 3.14.3 (783ms)
++ for cmd in curl python3 pip git
+++ date +%s%3N
++ ts=1775893084375
++ command -v pip
+++ pip --version
+++ head -1
++ ver='pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14)'
++ check_pass cmd:pip 'pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14)' 1775893084375
++ local name=cmd:pip 'msg=pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14)' ts_start=1775893084375
++ (( PASSED_CHECKS++ ))
++ (( TOTAL_CHECKS++ ))
++ PASS_MESSAGES+=("✓ ${name}: ${msg}")
++ [[ 1775893084375 != \0 ]]
+++ date +%s%3N
++ local elapsed=991
++ CHECK_DURATIONS["${name}"]=991ms
++ log_pass 'cmd:pip — pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14) (991ms)'
++ echo -e '  ✓  cmd:pip — pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14) (991ms)'
+  ✓  cmd:pip — pip 26.0.1 from C:\Users\dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14) (991ms)
++ for cmd in curl python3 pip git
+++ date +%s%3N
++ ts=1775893085490
++ command -v git
+++ git --version
+++ head -1
++ ver='git version 2.53.0.windows.1'
++ check_pass cmd:git 'git version 2.53.0.windows.1' 1775893085490
++ local name=cmd:git 'msg=git version 2.53.0.windows.1' ts_start=1775893085490
++ (( PASSED_CHECKS++ ))
++ (( TOTAL_CHECKS++ ))
++ PASS_MESSAGES+=("✓ ${name}: ${msg}")
++ [[ 1775893085490 != \0 ]]
+++ date +%s%3N
++ local elapsed=375
++ CHECK_DURATIONS["${name}"]=375ms
++ log_pass 'cmd:git — git version 2.53.0.windows.1 (375ms)'
++ echo -e '  ✓  cmd:git — git version 2.53.0.windows.1 (375ms)'
+  ✓  cmd:git — git version 2.53.0.windows.1 (375ms)
++ ((  0 > 0  ))
+++ date +%s%3N
++ ts=1775893085987
+++ python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")'
++ PY_VERSION=3.14.3
+++ echo 3.14.3
+++ cut -d. -f1
++ PY_MAJOR=3
+++ echo 3.14.3
+++ cut -d. -f2
++ PY_MINOR=14
++ ((  PY_MAJOR >= 3 && PY_MINOR >= 10  ))
++ check_pass python_version 'Python 3.14.3 ≥ 3.10' 1775893085987
++ local name=python_version 'msg=Python 3.14.3 ≥ 3.10' ts_start=1775893085987
++ (( PASSED_CHECKS++ ))
++ (( TOTAL_CHECKS++ ))
++ PASS_MESSAGES+=("✓ ${name}: ${msg}")
++ [[ 1775893085987 != \0 ]]
+++ date +%s%3N
++ local elapsed=1154
++ CHECK_DURATIONS["${name}"]=1154ms
++ log_pass 'python_version — Python 3.14.3 ≥ 3.10 (1154ms)'
++ echo -e '  ✓  python_version — Python 3.14.3 ≥ 3.10 (1154ms)'
+  ✓  python_version — Python 3.14.3 ≥ 3.10 (1154ms)
+++ date +%s%3N
++ ts=1775893087257
+++ python3 -c '
+import importlib, sys
+pkgs = {'\''fastapi'\'':'\''fastapi'\'','\''uvicorn'\'':'\''uvicorn'\'','\''pydantic'\'':'\''pydantic'\'',
+        '\''numpy'\'':'\''numpy'\'','\''pytest'\'':'\''pytest'\'','\''yaml'\'':'\''pyyaml'\'','\''openai'\'':'\''openai'\''}
+missing = []
+for mod, pkg in pkgs.items():
+    try: importlib.import_module(mod)
+    except ImportError: missing.append(pkg)
+print('\'','\''.join(missing) if missing else '\''all_present'\'')
+'
++ PYTHON_PKGS_STATUS=all_present
++ [[ all_present == \a\l\l\_\p\r\e\s\e\n\t ]]
++ check_pass python_packages 'All required packages importable' 1775893087257
++ local name=python_packages 'msg=All required packages importable' ts_start=1775893087257
++ (( PASSED_CHECKS++ ))
++ (( TOTAL_CHECKS++ ))
++ PASS_MESSAGES+=("✓ ${name}: ${msg}")
++ [[ 1775893087257 != \0 ]]
+++ date +%s%3N
++ local elapsed=3236
++ CHECK_DURATIONS["${name}"]=3236ms
++ log_pass 'python_packages — All required packages importable (3236ms)'
++ echo -e '  ✓  python_packages — All required packages importable (3236ms)'
+  ✓  python_packages — All required packages importable (3236ms)
+++ date +%s%3N
++ ts=1775893090612
++ [[ false == \f\a\l\s\e ]]
++ command -v docker
+++ docker --version
+++ head -1
++ DOCKER_VERSION='Docker version 29.2.1, build a5c7197'
+++ docker info
+++ grep -E 'Server Version|Storage Driver'
+++ head -2
+++ tr '\n' ' '
++ DOCKER_INFO=
++ cleanup
++ [[ false == \t\r\u\e ]]
