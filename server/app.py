@@ -710,12 +710,15 @@ async def reset_episode(request: Request) -> JSONResponse:
     t0 = time.monotonic()
     body_raw = await request.body()
     try:
-        # Use raw_decode to extract the first JSON object and ignore trailing garbage
-        # which is common when running curl from some Windows/GitBash environments.
         raw_str = body_raw.decode("utf-8").strip()
-        decoder = json.JSONDecoder()
-        body_dict, _ = decoder.raw_decode(raw_str)
-        body = ResetRequest(**body_dict)
+        if not raw_str:
+            # Handle empty body by using default ResetRequest
+            body = ResetRequest()
+        else:
+            # Use raw_decode to extract the first JSON object and ignore trailing garbage
+            decoder = json.JSONDecoder()
+            body_dict, _ = decoder.raw_decode(raw_str)
+            body = ResetRequest(**body_dict)
     except Exception as exc:
         logger.warning("Reset request aggressive parsing failed: %s", exc)
         raise HTTPException(status_code=422, detail=f"Aggressive parsing failure (check for trailing garbage): {exc}")
@@ -776,11 +779,15 @@ async def reset_episode(request: Request) -> JSONResponse:
 async def step_episode(request: Request) -> JSONResponse:
     body_raw = await request.body()
     try:
-        # Use raw_decode to extract the first JSON object and ignore trailing garbage
         raw_str = body_raw.decode("utf-8").strip()
-        decoder = json.JSONDecoder()
-        body_dict, _ = decoder.raw_decode(raw_str)
-        body = StepRequest(**body_dict)
+        if not raw_str:
+            # This will raise a Pydantic validation error correctly because 'action' is required
+            body = StepRequest(**{})
+        else:
+            # Use raw_decode to extract the first JSON object and ignore trailing garbage
+            decoder = json.JSONDecoder()
+            body_dict, _ = decoder.raw_decode(raw_str)
+            body = StepRequest(**body_dict)
     except Exception as exc:
         logger.warning("Step request aggressive parsing failed: %s", exc)
         raise HTTPException(status_code=422, detail=f"Aggressive parsing failure (check for trailing garbage): {exc}")
