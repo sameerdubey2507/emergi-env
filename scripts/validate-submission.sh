@@ -10,19 +10,19 @@
 #   - curl (usually pre-installed)
 #
 # Run:
-#   curl -fsSL https://raw.githubusercontent.com/sameerdubey2507/emergi-env/main/scripts/validate-submission.sh | bash -s -- https://sameerdubey25-emergi-env.hf.space [repo_dir]
+#   curl -fsSL https://raw.githubusercontent.com/sameerdubey2507/emergi-env/main/scripts/validate-submission.sh | bash -s -- https://huggingface.co/spaces/sameerdubey25/emergi-env [repo_dir]
 #
 #   Or download and run locally:
 #     chmod +x validate-submission.sh
-#     ./validate-submission.sh https://sameerdubey25-emergi-env.hf.space [repo_dir]
+#     ./validate-submission.sh https://huggingface.co/spaces/sameerdubey25/emergi-env [repo_dir]
 #
 # Arguments:
-#   ping_url   Your HuggingFace Space URL (e.g. https://sameerdubey25-emergi-env.hf.space)
+#   ping_url   Your HuggingFace Space URL (e.g. https://huggingface.co/spaces/sameerdubey25/emergi-env)
 #   repo_dir   Path to your repo (default: current directory)
 #
 # Examples:
-#   ./validate-submission.sh https://sameerdubey25-emergi-env.hf.space
-#   ./validate-submission.sh https://sameerdubey25-emergi-env.hf.space ./emergi-env
+#   ./validate-submission.sh https://huggingface.co/spaces/sameerdubey25/emergi-env
+#   ./validate-submission.sh https://huggingface.co/spaces/sameerdubey25/emergi-env ./emergi-env
 #
 
 set -uo pipefail
