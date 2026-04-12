@@ -12,7 +12,7 @@ COPY static/ ./
 RUN npm run build
 
 
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 
 ARG APP_USER=emergi
 ARG APP_UID=10001
