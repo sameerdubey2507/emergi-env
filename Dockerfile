@@ -125,11 +125,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # System deps (curl + netcat for healthcheck/entrypoint)
 RUN apt-get update --fix-missing && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     tzdata curl netcat-traditional jq procps && \
     ln -snf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime && \
     echo "Asia/Kolkata" > /etc/timezone && \
     rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m pip install --upgrade pip setuptools wheel
 
 # Non-root user
 RUN groupadd --gid ${APP_GID} ${APP_USER} && \
