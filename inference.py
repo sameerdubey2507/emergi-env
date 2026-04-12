@@ -11,7 +11,6 @@ Mandatory compliance:
   - Never exits with non-zero / never raises unhandled exceptions
 """
 
-# ── stdlib only at top-level (zero import-time crash risk) ────────────────────
 import io
 import json
 import logging
@@ -26,6 +25,16 @@ import urllib.error
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import traceback
+
+# ── IMPENETRABLE CRASH SHIELD ────────────────────────────────────────────────
+def _global_crash_handler(exc_type, exc_value, exc_traceback):
+    print(f"[FATAL GLOBAL CRASH] {exc_type.__name__}: {exc_value}", file=sys.stderr, flush=True)
+    traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stderr)
+    print("[END] success=false steps=0 score=0.000 rewards=0.00", flush=True)
+    os._exit(0) # FORCIBLY return 0 so the platform never sees a non-zero exit code!
+
+sys.excepthook = _global_crash_handler
+# ─────────────────────────────────────────────────────────────────────────────
 
 # Get absolute path regardless of how the script is called
 _HERE = os.path.dirname(os.path.realpath(__file__))
@@ -749,17 +758,33 @@ def _build_prompt(obs: Obs, history: List[Dict]) -> str:
 # ── LLM caller ─────────────────────────────────────────────────────────────────
 class LLMCaller:
     """
-    Safe LLM wrapper (LLM disabled for validator stability).
-    Always falls back to rule_decide().
+    Safe LLM wrapper for validator environment.
+    LLM is disabled to avoid dependency or network failures.
+    The agent will fall back to rule_decide().
     """
 
     def __init__(self) -> None:
-        self._client = None
+        # Disable OpenAI usage
+        try:
+            self._client = None
+            logger.warning("LLM disabled — using rule-based fallback agent")
+        except Exception as exc:
+            # Absolute safeguard
+            self._client = None
+            logger.error("LLMCaller init safeguard triggered: %s", exc)
 
-    def call(self, system: str, user: str):
-        return None, 0
+    def call(self, system: str, user: str) -> Tuple[Optional[Dict], int]:
+        """
+        LLM call wrapper.
+        Since LLM is disabled, always return fallback signal.
+        """
+        try:
+            return None, 0
+        except Exception:
+            return None, 0
 
 
+# ── HTTP client — httpx if available, urllib otherwise ────────────────────────
 class EnvClient:
     """
     HTTP client for the EMERGI-ENV FastAPI server.
@@ -958,8 +983,8 @@ def wait_server(env: EnvClient, timeout: float = 120.0) -> bool:
         # Elapsed wait since we began probing (deadline = start + timeout).
         elapsed = int(time.monotonic() - (deadline - timeout))
         if spin % 5 == 0:
-            print(f"[INFO] Waiting for server… ({elapsed}s / {int(timeout)}s)", file=sys.stderr,
-      file=sys.stderr, flush=True)
+            print(f"[INFO] Waiting for server… ({elapsed}s / {int(timeout)}s)",
+                  flush=True)
         spin += 1
         time.sleep(3.0)
     return False
@@ -969,15 +994,21 @@ def wait_server(env: EnvClient, timeout: float = 120.0) -> bool:
 def main() -> int:
     import argparse
     ap = argparse.ArgumentParser(description="EMERGI-ENV Inference Script")
-    ap.add_argument("--task",   default=None,
+    ap.add_argument("--task",   default=os.getenv("EMERGI_ENV_TASK", os.getenv("OPENENV_TASK", None)),
                     help="Run a single task ID")
     ap.add_argument("--tasks",  nargs="+", default=None,
                     help="Run specific task IDs")
-    ap.add_argument("--server", default=SERVER_URL,
+    ap.add_argument("--server", default=os.getenv("SERVER_URL", SERVER_URL),
                     help="FastAPI server base URL")
-    ap.add_argument("--seed",   type=int, default=None,
+    ap.add_argument("--seed",   type=int, default=os.getenv("SEED", None),
                     help="Seed override for all tasks")
-    args, _unknown = ap.parse_known_args()  # ignore unknown args — never sys.exit(2)
+    args, _unknown = ap.parse_known_args()  # ignore unknown args
+
+    tasks = args.tasks or ([args.task] if args.task else TASK_IDS)
+    
+    # If the user or platform just calls "python inference.py", let's only run ONE task if they passed EMERGI_ENV_TASK
+    # If they passed nothing, we still run all TASK_IDS, but we should log clearly.
+    print(f"[INFO] Tasks queued: {tasks}", file=sys.stderr, flush=True)
 
     base_url   = (args.server or SERVER_URL).rstrip("/")
     if not base_url.startswith("http"):
