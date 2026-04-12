@@ -932,7 +932,11 @@ def run_episode(env: EnvClient, llm: LLMCaller, task_id: str) -> None:
     log_start(task_id)
 
     try:
-        raw = env.reset(task_id, seed, sid)
+        try:
+            raw = env.reset(task_id, seed, sid)
+        except Exception as exc:
+            print(f"[FATAL] Env connection failed during reset: {exc}", flush=True)
+            raise  # re-raise so we can see the traceback in the validator log
 
         for step_num in range(1, max_s + 1):
             steps     = step_num
@@ -971,8 +975,8 @@ def run_episode(env: EnvClient, llm: LLMCaller, task_id: str) -> None:
                 done   = bool(resp.get("done",   False))
                 raw    = resp
             except Exception as exc:
-                error_msg = str(exc).replace("\n", " ")[:200]
-                done = True
+                print(f"[FATAL] Env connection failed during step: {exc}", flush=True)
+                raise  # re-raise so we can see the traceback in the validator log
 
             rewards.append(reward)
             log_step(step_num, action, reward, done, error_msg)
@@ -992,9 +996,9 @@ def run_episode(env: EnvClient, llm: LLMCaller, task_id: str) -> None:
             score = max(0.0, min(1.0, score))
             success = score >= BASELINES.get(task_id, 0.0)
         except Exception as exc:
-            logger.warning("Grade failed (%s) — estimating from rewards", exc)
-            score   = min(1.0, sum(rewards) / max(len(rewards), 1)) if rewards else 0.0
-            success = False
+            print(f"[FATAL] Env connection failed during grade: {exc}", flush=True)
+            raise  # re-raise so we can see the traceback in the validator log
+
 
     except Exception as exc:
         logger.error("Episode crashed for %s: %s", task_id, exc)
@@ -1042,6 +1046,10 @@ def main() -> int:
     args = ap.parse_args()
 
     base_url   = (args.server or SERVER_URL).rstrip("/")
+    if not base_url.startswith("http"):
+        base_url = "http://" + base_url
+
+    print(f"[INFO] Using EMERGI-ENV SERVER at: {base_url}", flush=True)
     env_client = EnvClient(base_url)
 
     # ── HF token (optional at runtime — LLM uses rule fallback if unset) ───────
@@ -1128,14 +1136,11 @@ def main() -> int:
 
     try:
         for task_id in tasks:
-            try:
-                run_episode(env_client, llm, task_id)
-            except Exception as exc:
-                logger.error("Unhandled in task %s: %s", task_id, exc)
-                log_start(task_id)
-                log_step(1, {"action_type": "noop"}, 0.0, True, str(exc)[:200])
-                log_end(False, 1, 0.0, [0.0])
+            # We don't catch exceptions here anymore as per instructions, allowing it to bubble up to __main__ block
+            # so the validator can print the traceback.
+            run_episode(env_client, llm, task_id)
     except KeyboardInterrupt:
+
         print("[WARN] Interrupted.", flush=True)
     finally:
         env_client.close()
