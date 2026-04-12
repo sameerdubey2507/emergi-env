@@ -103,7 +103,12 @@ HF_TOKEN: str = os.getenv("HF_TOKEN", os.getenv("API_KEY", "")) or ""
 
 API_KEY: str = HF_TOKEN  # alias — always equals HF_TOKEN
 
-SERVER_URL: str = (os.getenv("SERVER_URL", "http://localhost:7860") or "http://localhost:7860").rstrip("/")
+# Known HF Space URL — works whether validator runs inside or outside container
+_HF_SPACE_URL: str = "https://sameerdubey25-emergi-env.hf.space"
+SERVER_URL: str = (
+    (os.getenv("SERVER_URL") or os.getenv("ENV_URL") or "").rstrip("/")
+    or "http://localhost:7860"
+)
 MAX_TOKENS: int = _safe_int("MAX_LLM_TOKENS", 800)
 TEMPERATURE: float = _safe_float("LLM_TEMPERATURE", 0.2)
 LLM_TIMEOUT: float = max(1.0, _safe_float("LLM_TIMEOUT", 40.0))
@@ -1016,11 +1021,14 @@ def main() -> int:
 
     print(f"[INFO] Using EMERGI-ENV SERVER at: {base_url}", file=sys.stderr, flush=True)
 
-    # ── Try multiple server URLs — validator may set SERVER_URL differently ──────
-    # Priority: CLI arg → SERVER_URL env → localhost → 0.0.0.0
+    # ── Try multiple server URLs — validator may run inside OR outside container ─
+    # Priority: CLI arg → SERVER_URL env → HF Space URL → localhost
     candidate_urls = []
-    if base_url and base_url != "http://localhost:7860":
+    if base_url and base_url not in ("http://localhost:7860", "http://127.0.0.1:7860"):
         candidate_urls.append(base_url)
+    # Always include HF Space URL — works when run outside container
+    candidate_urls.append(_HF_SPACE_URL)
+    # Local fallbacks — work when run inside container
     candidate_urls += [
         "http://localhost:7860",
         "http://127.0.0.1:7860",
