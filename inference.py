@@ -1027,7 +1027,7 @@ def wait_server(env: EnvClient, timeout: float = 120.0) -> bool:
         elapsed = int(time.monotonic() - (deadline - timeout))
         if spin % 5 == 0:
             print(f"[INFO] Waiting for server… ({elapsed}s / {int(timeout)}s)",
-                  flush=True)
+      file=sys.stderr, flush=True)
         spin += 1
         time.sleep(3.0)
     return False
